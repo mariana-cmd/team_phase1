@@ -82,6 +82,7 @@ public class ControllerFirstAdmin {
 	protected static void setAdminPassword1() {
 		adminPassword1 = ViewFirstAdmin.text_AdminPassword1.getText();
 		ViewFirstAdmin.label_PasswordsDoNotMatch.setText("");
+		ViewFirstAdmin.label_InvalidPassword.setText("");
 	}
 	
 	
@@ -95,6 +96,7 @@ public class ControllerFirstAdmin {
 	protected static void setAdminPassword2() {
 		adminPassword2 = ViewFirstAdmin.text_AdminPassword2.getText();		
 		ViewFirstAdmin.label_PasswordsDoNotMatch.setText("");
+		ViewFirstAdmin.label_InvalidPassword.setText("");
 	}
 	
 	
@@ -108,8 +110,10 @@ public class ControllerFirstAdmin {
 	 */
 	protected static void doSetupAdmin(Stage ps, int r) {
 		
-		// Make sure the two passwords are the same, and valid username and password
-		if (adminPassword1.compareTo(adminPassword2) == 0 && (UserNameRecognizer.checkForValidUserName(adminUsername)=="") && (PasswordRecognizer.checkPassword(adminPassword1)=="")) {
+		String userValidation = UserNameRecognizer.checkForValidUserName(adminUsername);
+		String passValidation = PasswordRecognizer.checkPassword(adminPassword1);
+		// Make sure the passwords are valid & the same and username is valid 
+		if (adminPassword1.compareTo(adminPassword2) == 0 && userValidation.isEmpty() && passValidation.isEmpty()) {
         	// Create the passwords and proceed to the user home page
         	User user = new User(adminUsername, adminPassword1, "", "", "", "", "", true, false, 
         			false);
@@ -128,20 +132,19 @@ public class ControllerFirstAdmin {
         	guiUserUpdate.ViewUserUpdate.displayUserUpdate(ViewFirstAdmin.theStage, user);
 		}
 		// If the user-name is invalid, clear everything and show error message. Clear when user types again
-		else if (UserNameRecognizer.checkForValidUserName(adminUsername)!="") {
+		else if (!userValidation.isEmpty()) {
 			ViewFirstAdmin.text_AdminUsername.setText("");
 			ViewFirstAdmin.text_AdminPassword1.setText("");
 			ViewFirstAdmin.text_AdminPassword2.setText("");
-			ViewFirstAdmin.label_InvalidUsername.setText(UserNameRecognizer.checkForValidUserName(adminUsername) + " Please try again!");
+			ViewFirstAdmin.label_InvalidUsername.setText(userValidation + " Please try again!");
 		}
 		
 		
 		// If the passwords are the same but are invalid, clear everything and show error message. Clear when user types
-		else if (PasswordRecognizer.checkPassword(adminPassword1) != "" && (adminPassword1.compareTo(adminPassword2)==0)) {
+		else if (!passValidation.isEmpty() && (adminPassword1.compareTo(adminPassword2)==0)) {
 			ViewFirstAdmin.text_AdminPassword1.setText("");
 			ViewFirstAdmin.text_AdminPassword2.setText("");
-			System.out.print(PasswordRecognizer.checkPassword(adminPassword1));
-			ViewFirstAdmin.label_PasswordsDoNotMatch.setText(PasswordRecognizer.checkPassword(adminPassword1) + " Please try again!");
+			ViewFirstAdmin.label_InvalidPassword.setText(passValidation + " Please try again!");
 		}
 		
 		// The two passwords are NOT the same, so clear the passwords, explain the passwords

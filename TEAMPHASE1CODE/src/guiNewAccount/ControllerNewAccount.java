@@ -81,10 +81,13 @@ public class ControllerNewAccount {
 		// Initialize local variables that will be created during this process
 		int roleCode = 0;
 		User user = null;
+		
+		String userValidation = UserNameRecognizer.checkForValidUserName(username);
+		String passValidation = PasswordRecognizer.checkPassword(password);
 
 		// Make sure the two passwords are the same.	
 		if (ViewNewAccount.text_Password1.getText().
-				compareTo(ViewNewAccount.text_Password2.getText()) == 0 && (UserNameRecognizer.checkForValidUserName(username)=="") && (PasswordRecognizer.checkPassword(password)=="")) {
+				compareTo(ViewNewAccount.text_Password2.getText()) == 0 && userValidation.isEmpty() && passValidation.isEmpty()) {
 			
 			// The passwords match so we will set up the role and the User object base on the 
 			// information provided in the invitation
@@ -131,17 +134,17 @@ public class ControllerNewAccount {
             
            // invalid username 
 		}
-		else if (UserNameRecognizer.checkForValidUserName(username)!="") {
+		else if (!userValidation.isEmpty()) {
 			ViewNewAccount.text_Username.setText("");
-			ViewNewAccount.alertUserNameError.setHeaderText(UserNameRecognizer.checkForValidUserName(username));
+			ViewNewAccount.alertUserNameError.setHeaderText(userValidation);
 			ViewNewAccount.alertUserNameError.showAndWait();
 			
 		}
 		// invalid password 
-		else if (PasswordRecognizer.checkPassword(password) != "") {
+		else if (!passValidation.isEmpty()) {
 			ViewNewAccount.text_Password1.setText("");
 			ViewNewAccount.text_Password2.setText("");
-			ViewNewAccount.alertInvalidPassword.setHeaderText(PasswordRecognizer.checkPassword(password));
+			ViewNewAccount.alertInvalidPassword.setHeaderText(passValidation);
 			ViewNewAccount.alertInvalidPassword.showAndWait();
 		}
 		

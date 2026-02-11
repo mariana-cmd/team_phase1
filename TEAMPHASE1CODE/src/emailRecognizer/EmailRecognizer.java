@@ -203,6 +203,10 @@ public class EmailRecognizer {
 						domainPartCounter++;
 						nextState = 3;
 					}
+					//invalid character found, so stop
+					else {
+						running = false;
+					}
 				}
 				
 				// else, break
@@ -256,6 +260,10 @@ public class EmailRecognizer {
 					else if (currentChar == '-') {
 						nextState = 4;
 						domainPartCounter++; //increment counter
+					}
+					// invalid character found, so stop
+					else {
+						running = false;
 					}
 				}
 				

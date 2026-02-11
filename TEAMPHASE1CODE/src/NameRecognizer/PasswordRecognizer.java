@@ -22,8 +22,8 @@ public class PasswordRecognizer {
 		currentCharNdx = 0;
 		
 		//no input
-		if (input.length() <= 0) {
-			return "Password must be at least 8 characters.";
+		if (input.length() < 7) {
+			return "Password must be longer than 8 characters.";
 		}
 		//input is too long
 		if (input.length() >= 255) {
@@ -81,29 +81,50 @@ public class PasswordRecognizer {
 			}
 		}
 			
-			String errMessage = "";
-			if (!foundUpperCase)
-				errMessage += " atleast one upper case letter.";
-			
-			if (!foundLowerCase)
-				errMessage += " atleast one lower case letter.";
-			
-			if (!foundNumericDigit)
-				errMessage += " atleast one numeric digit";
-				
-			if (!foundSpecialChar)
-				errMessage += " atleast one special character.";
-				
-			if (!foundLongEnough)
-				errMessage += " atleast 8 characters.";
-			
-			if (errMessage == "")
-				return "";
-			
-			// If it gets here, there something was not found, so return an appropriate message
-			passwordIndexofError = currentCharNdx;
-			
-			return "Password does not have " + errMessage;
+		String errMessage = "";
+		boolean firstError = true;
+
+		if (!foundUpperCase) {
+		    errMessage += "→ At least one upper case letter";
+		    firstError = false;
+		}
+
+		if (!foundLowerCase) {
+		    if (!firstError) {
+		        errMessage += "\n";
+		    }
+		    errMessage += "→ At least one lower case letter";
+		    firstError = false;
+		}
+
+		if (!foundNumericDigit) {
+		    if (!firstError) {
+		        errMessage += "\n";
+		    }
+		    errMessage += "→ At least one numeric digit";
+		    firstError = false;
+		}
+
+		if (!foundSpecialChar) {
+		    if (!firstError) {
+		        errMessage += "\n";
+		    }
+		    errMessage += "→ At least one special character";
+		    firstError = false;
+		}
+
+		if (!foundLongEnough) {
+		    if (!firstError) {
+		        errMessage += "\n";
+		    }
+		    errMessage += "→ At least 8 characters";
+		}
+
+		if (errMessage.isEmpty())
+		    return "";
+
+		passwordIndexofError = currentCharNdx;
+		return "Password is missing:\n" + errMessage + "\n";
 	
 
 		}

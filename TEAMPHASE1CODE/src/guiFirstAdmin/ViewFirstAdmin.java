@@ -58,6 +58,7 @@ public class ViewFirstAdmin {
 	
 	protected static Label label_PasswordsDoNotMatch = new Label();
 	protected static Label label_InvalidUsername = new Label();
+	protected static Label label_InvalidPassword = new Label();
 	protected static TextField text_AdminUsername = new TextField();
 	protected static PasswordField text_AdminPassword1 = new PasswordField();
 	protected static PasswordField text_AdminPassword2 = new PasswordField();
@@ -188,6 +189,8 @@ public class ViewFirstAdmin {
 		//Label to display UserName Error
 		setupLabelUI(label_InvalidUsername, "Arial", 18, width, Pos.CENTER, 0, 300);
 		
+		setupLabelUI(label_InvalidPassword, "Arial", 18, width, Pos.BASELINE_CENTER, 0, 350);
+		
 		
 
 		setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
@@ -196,7 +199,7 @@ public class ViewFirstAdmin {
 		// Place all of the just-initialized GUI elements into the pane
 		theRootPane.getChildren().addAll(label_ApplicationTitle, label_TitleLine1,
 				label_TitleLine2, text_AdminUsername, text_AdminPassword1, 
-				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch, label_InvalidUsername,
+				text_AdminPassword2, button_AdminSetup, label_PasswordsDoNotMatch, label_InvalidUsername, label_InvalidPassword,
 				button_Quit);
 	}
 	

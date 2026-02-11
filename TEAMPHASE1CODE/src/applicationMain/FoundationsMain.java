@@ -1,6 +1,7 @@
 package applicationMain;
 	
 import java.sql.SQLException;
+
 import database.Database;
 import javafx.application.Application;
 import javafx.stage.Stage;
