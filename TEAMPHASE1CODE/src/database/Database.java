@@ -59,6 +59,7 @@ public class Database {
 	private boolean currentAdminRole;
 	private boolean currentNewRole1;
 	private boolean currentNewRole2;
+	private boolean currentOneTimePassword;
 
 	/*******
 	 * <p> Method: Database </p>
@@ -68,10 +69,27 @@ public class Database {
 	 */
 	
 	public Database () {
-		
+
 	}
-	
-	
+
+	/*******
+	 * <p> Class: UserDetails </p>
+	 *
+	 * <p> Description: Helper class to hold complete user information for listing users.</p>
+	 */
+	public static class UserDetails {
+		public String username;
+		public String firstName;
+		public String middleName;
+		public String lastName;
+		public String preferredFirstName;
+		public String email;
+		public boolean adminRole;
+		public boolean role1;
+		public boolean role2;
+	}
+
+
 /*******
  * <p> Method: connectToDatabase </p>
  * 
@@ -115,14 +133,16 @@ public class Database {
 				+ "emailAddress VARCHAR(255), "
 				+ "adminRole BOOL DEFAULT FALSE, "
 				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
+				+ "newRole2 BOOL DEFAULT FALSE, "
+				+ "oneTimePassword BOOL DEFAULT FALSE)";
 		statement.execute(userTable);
 		
 		// Create the invitation codes table
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	    		+ "emailAddress VARCHAR(255), "
-	            + "role VARCHAR(10))";
+	            + "role VARCHAR(10), "
+	            + "deadline TIMESTAMP)";
 	    statement.execute(invitationCodesTable);
 	}
 
@@ -167,6 +187,27 @@ public class Database {
 		} catch (SQLException e) {
 	        return 0;
 	    }
+		return 0;
+	}
+
+/*******
+ * <p> Method: getAdminCount </p>
+ *
+ * <p> Description: Returns the number of users with admin role. </p>
+ *
+ * @return the number of admin users in the database.
+ *
+ */
+	public int getAdminCount() {
+		String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
+		try {
+			ResultSet resultSet = statement.executeQuery(query);
+			if (resultSet.next()) {
+				return resultSet.getInt("count");
+			}
+		} catch (SQLException e) {
+			return 0;
+		}
 		return 0;
 	}
 
@@ -242,6 +283,38 @@ public class Database {
 	    }
 //		System.out.println(userList);
 		return userList;
+	}
+
+/*******
+ *  <p> Method: List<UserDetails> getAllUserDetails() </p>
+ *
+ *  <P> Description: Get complete details for all users in the database. </p>
+ *
+ *  @return a list of UserDetails objects containing all user information.
+ */
+	public List<UserDetails> getAllUserDetails() {
+		List<UserDetails> userDetailsList = new ArrayList<>();
+		String query = "SELECT userName, firstName, middleName, lastName, preferredFirstName, " +
+					   "emailAddress, adminRole, newRole1, newRole2 FROM userDB";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				UserDetails details = new UserDetails();
+				details.username = rs.getString("userName");
+				details.firstName = rs.getString("firstName");
+				details.middleName = rs.getString("middleName");
+				details.lastName = rs.getString("lastName");
+				details.preferredFirstName = rs.getString("preferredFirstName");
+				details.email = rs.getString("emailAddress");
+				details.adminRole = rs.getBoolean("adminRole");
+				details.role1 = rs.getBoolean("newRole1");
+				details.role2 = rs.getBoolean("newRole2");
+				userDetailsList.add(details);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return userDetailsList;
 	}
 
 /*******
@@ -391,12 +464,19 @@ public class Database {
 	// Generates a new invitation code and inserts it into the database.
 	public String generateInvitationCode(String emailAddress, String role) {
 	    String code = UUID.randomUUID().toString().substring(0, 6); // Generate a random 6-character code
-	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role) VALUES (?, ?, ?)";
+
+	    // Set deadline to 7 days from now
+	    long currentTime = System.currentTimeMillis();
+	    long sevenDays = 7 * 24 * 60 * 60 * 1000L; // 7 days in milliseconds
+	    Timestamp deadline = new Timestamp(currentTime + sevenDays);
+
+	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role, deadline) VALUES (?, ?, ?, ?)";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.setString(2, emailAddress);
 	        pstmt.setString(3, role);
+	        pstmt.setTimestamp(4, deadline);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -407,17 +487,19 @@ public class Database {
 	
 	/*******
 	 * <p> Method: int getNumberOfInvitations() </p>
-	 * 
-	 * <p> Description: Determine the number of outstanding invitations in the table.</p>
-	 *  
-	 * @return the number of invitations in the table.
-	 * 
+	 *
+	 * <p> Description: Determine the number of outstanding (non-expired) invitations in the table.</p>
+	 *
+	 * @return the number of non-expired invitations in the table.
+	 *
 	 */
-	// Number of invitations in the database
+	// Number of non-expired invitations in the database
 	public int getNumberOfInvitations() {
-		String query = "SELECT COUNT(*) AS count FROM InvitationCodes";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
+		String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE deadline > ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+			pstmt.setTimestamp(1, now);
+			ResultSet resultSet = pstmt.executeQuery();
 			if (resultSet.next()) {
 				return resultSet.getInt("count");
 			}
@@ -481,7 +563,33 @@ public class Database {
 	    return "";
 	}
 
-	
+	/*******
+	 * <p> Method: boolean isInvitationCodeExpired(String code) </p>
+	 *
+	 * <p> Description: Check if an invitation code has expired.</p>
+	 *
+	 * @param code is the 6 character String invitation code
+	 *
+	 * @return true if expired or not found, false if still valid
+	 *
+	 */
+	public boolean isInvitationCodeExpired(String code) {
+	    String query = "SELECT deadline FROM InvitationCodes WHERE code = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, code);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            Timestamp deadline = rs.getTimestamp("deadline");
+	            Timestamp now = new Timestamp(System.currentTimeMillis());
+	            return now.after(deadline); // Returns true if current time is after deadline
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return true; // If code not found, treat as expired
+	}
+
+
 	/*******
 	 * <p> Method: String getEmailAddressUsingCode (String code ) </p>
 	 * 
@@ -518,24 +626,13 @@ public class Database {
 	 */
 	// Remove an invitation using an email address once the user account has been setup
 	public void removeInvitationAfterUse(String code) {
-	    String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE code = ?";
+	    String query = "DELETE FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	        	int counter = rs.getInt(1);
-	            // Only do the remove if the code is still in the invitation table
-	        	if (counter > 0) {
-        			query = "DELETE FROM InvitationCodes WHERE code = ?";
-	        		try (PreparedStatement pstmt2 = connection.prepareStatement(query)) {
-	        			pstmt2.setString(1, code);
-	        			pstmt2.executeUpdate();
-	        		}catch (SQLException e) {
-	        	        e.printStackTrace();
-	        	    }
-	        	}
-	        }
+	        int rowsDeleted = pstmt.executeUpdate();
+	        System.out.println("Removed invitation code: " + code + " (rows deleted: " + rowsDeleted + ")");
 	    } catch (SQLException e) {
+	        System.err.println("Error removing invitation code: " + code);
 	        e.printStackTrace();
 	    }
 		return;
@@ -594,7 +691,32 @@ public class Database {
 	    }
 	}
 
-	
+
+	/*******
+	 * <p> Method: void updatePassword(String username, String password) </p>
+	 *
+	 * <p> Description: Update the password of a user and clear the one-time password flag.</p>
+	 *
+	 * @param username is the username of the user
+	 *
+	 * @param password is the new password for the user
+	 *
+	 */
+	public void updatePassword(String username, String password) {
+	    String query = "UPDATE userDB SET password = ?, oneTimePassword = ? WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, password);
+	        pstmt.setBoolean(2, false);
+	        pstmt.setString(3, username);
+	        pstmt.executeUpdate();
+	        currentPassword = password;
+	        currentOneTimePassword = false;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
 	/*******
 	 * <p> Method: String getMiddleName(String username) </p>
 	 * 
@@ -832,6 +954,7 @@ public class Database {
 	    	currentAdminRole = rs.getBoolean(9);
 	    	currentNewRole1 = rs.getBoolean(10);
 	    	currentNewRole2 = rs.getBoolean(11);
+	    	currentOneTimePassword = rs.getBoolean(12);
 			return true;
 	    } catch (SQLException e) {
 			return false;
@@ -857,6 +980,21 @@ public class Database {
 	// Update a users role
 	public boolean updateUserRole(String username, String role, String value) {
 		if (role.compareTo("Admin") == 0) {
+			// Safeguards when removing admin role
+			if (value.compareTo("false") == 0) {
+				// Safeguard 1: Cannot remove admin role from own account
+				if (username.equals(currentUsername)) {
+					System.err.println("Cannot remove admin role from own account");
+					return false;
+				}
+
+				// Safeguard 2: Must maintain at least one admin
+				if (getAdminCount() <= 1) {
+					System.err.println("Cannot remove last admin from system");
+					return false;
+				}
+			}
+
 			String query = "UPDATE userDB SET adminRole = ? WHERE username = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setString(1, value);
@@ -1007,22 +1145,33 @@ public class Database {
 	
 	/*******
 	 * <p> Method: boolean getCurrentNewRole2() </p>
-	 * 
+	 *
 	 * <p> Description: Get the current user's Reviewer role attribute.</p>
-	 * 
+	 *
 	 * @return true if this user plays a Reviewer role, else false
-	 *  
+	 *
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
 
-	
+
+	/*******
+	 * <p> Method: boolean getCurrentOneTimePassword() </p>
+	 *
+	 * <p> Description: Get the current user's one-time password flag.</p>
+	 *
+	 * @return true if this user is using a one-time password, else false
+	 *
+	 */
+	public boolean getCurrentOneTimePassword() { return currentOneTimePassword;};
+
+
 	/*******
 	 * <p> Debugging method</p>
-	 * 
+	 *
 	 * <p> Description: Debugging method that dumps the database of the console.</p>
-	 * 
+	 *
 	 * @throws SQLException if there is an issues accessing the database.
-	 * 
+	 *
 	 */
 	// Dumps the database.
 	public void dump() throws SQLException {
@@ -1040,12 +1189,101 @@ public class Database {
 		resultSet.close();
 	}
 
+	/*******
+	 * <p> Method: boolean deleteUser(String username)</p>
+	 *
+	 * <p> Description: Deletes a user account from the database with safeguards.</p>
+	 *
+	 * @param username the username of the account to delete
+	 *
+	 * @return true if deletion was successful, false otherwise
+	 *
+	 */
+	public boolean deleteUser(String username) {
+		// Safeguard 1: Cannot delete own account
+		if (username.equals(currentUsername)) {
+			System.err.println("Cannot delete own account");
+			return false;
+		}
+
+		// Safeguard 2: Check if this is an admin and if they're the last admin
+		if (getUserAccountDetails(username)) {
+			if (getCurrentAdminRole() && getAdminCount() <= 1) {
+				System.err.println("Cannot delete last admin");
+				return false;
+			}
+		}
+
+		// Delete the user
+		String query = "DELETE FROM userDB WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/*******
+	 * <p> Method: String generateOneTimePassword(String username)</p>
+	 *
+	 * <p> Description: Generates a one-time password for the specified user.</p>
+	 *
+	 * @param username the username for which to generate a one-time password
+	 * @return the generated one-time password, or null if failed
+	 *
+	 */
+	public String generateOneTimePassword(String username) {
+		// Generate a random 8-character password
+		String oneTimePass = UUID.randomUUID().toString().substring(0, 8);
+
+		String query = "UPDATE userDB SET password = ?, oneTimePassword = ? WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, oneTimePass);
+			pstmt.setBoolean(2, true);
+			pstmt.setString(3, username);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected > 0) {
+				return oneTimePass;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	/*******
+	 * <p> Method: boolean clearOneTimePasswordFlag(String username)</p>
+	 *
+	 * <p> Description: Clears the one-time password flag for the specified user.</p>
+	 *
+	 * @param username the username for which to clear the one-time password flag
+	 * @return true if successful, else false
+	 *
+	 */
+	public boolean clearOneTimePasswordFlag(String username) {
+		String query = "UPDATE userDB SET oneTimePassword = ? WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setBoolean(1, false);
+			pstmt.setString(2, username);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 
 	/*******
 	 * <p> Method: void closeConnection()</p>
-	 * 
+	 *
 	 * <p> Description: Closes the database statement and connection.</p>
-	 * 
+	 *
 	 */
 	// Closes the database statement and connection.
 	public void closeConnection() {

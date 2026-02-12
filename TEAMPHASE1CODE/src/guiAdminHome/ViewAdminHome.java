@@ -174,7 +174,13 @@ public class ViewAdminHome {
 
 		// Set the role for potential users to the default (No role selected)
 		combobox_SelectRole.getSelectionModel().select(0);
-				
+
+		// Refresh the counts
+		label_NumberOfInvitations.setText("Number of outstanding invitations: " +
+				theDatabase.getNumberOfInvitations());
+		label_NumberOfUsers.setText("Number of users: " +
+				theDatabase.getNumberOfUsers());
+
 		// Set the title for the window, display the page, and wait for the Admin to do something
 		theStage.setTitle("CSE 360 Foundation Code: Admin Home Page");
 		theStage.setScene(theAdminHomeScene);						// Set this page onto the stage

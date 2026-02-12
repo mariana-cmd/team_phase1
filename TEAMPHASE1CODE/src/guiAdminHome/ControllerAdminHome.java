@@ -103,50 +103,162 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: setOnetimePassword () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that allows an admin to set a one-time password
+	 * for a user account. The user will be required to change this password on next login. </p>
 	 */
 	protected static void setOnetimePassword () {
-		System.out.println("\n*** WARNING ***: One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+		// Get list of users
+		java.util.List<String> userList = theDatabase.getUserList();
+
+		// Remove the placeholder
+		if (!userList.isEmpty() && userList.get(0).equals("<Select a User>")) {
+			userList.remove(0);
+		}
+
+		if (userList.isEmpty()) {
+			ViewAdminHome.alertNotImplemented.setTitle("No Users");
+			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Set Password");
+			ViewAdminHome.alertNotImplemented.setContentText("No users available.");
+			ViewAdminHome.alertNotImplemented.showAndWait();
+			return;
+		}
+
+		// Create selection dialog
+		javafx.scene.control.ChoiceDialog<String> dialog =
+			new javafx.scene.control.ChoiceDialog<>(userList.get(0), userList);
+		dialog.setTitle("Set One-Time Password");
+		dialog.setHeaderText("Select User");
+		dialog.setContentText("Choose user:");
+
+		java.util.Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String selectedUser = result.get();
+
+			// Generate one-time password
+			String oneTimePass = theDatabase.generateOneTimePassword(selectedUser);
+
+			if (oneTimePass != null) {
+				ViewAdminHome.alertNotImplemented.setTitle("Success");
+				ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Set");
+				ViewAdminHome.alertNotImplemented.setContentText(
+					"One-time password for " + selectedUser + ": " + oneTimePass +
+					"\n\nThe user will be required to change this password upon next login.");
+				System.out.println("One-time password set for " + selectedUser + ": " + oneTimePass);
+			} else {
+				ViewAdminHome.alertNotImplemented.setTitle("Error");
+				ViewAdminHome.alertNotImplemented.setHeaderText("Failed");
+				ViewAdminHome.alertNotImplemented.setContentText(
+					"Could not set one-time password.");
+			}
+			ViewAdminHome.alertNotImplemented.showAndWait();
+		}
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: deleteUser () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that allows an admin to delete a user account
+	 * with confirmation and safeguards. </p>
 	 */
 	protected static void deleteUser() {
-		System.out.println("\n*** WARNING ***: Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("Delete User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+		// Get list of users
+		java.util.List<String> userList = theDatabase.getUserList();
+
+		// Remove the placeholder
+		if (!userList.isEmpty() && userList.get(0).equals("<Select a User>")) {
+			userList.remove(0);
+		}
+
+		if (userList.isEmpty()) {
+			ViewAdminHome.alertNotImplemented.setTitle("No Users");
+			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Delete");
+			ViewAdminHome.alertNotImplemented.setContentText("No users available to delete.");
+			ViewAdminHome.alertNotImplemented.showAndWait();
+			return;
+		}
+
+		// Create selection dialog
+		javafx.scene.control.ChoiceDialog<String> dialog =
+			new javafx.scene.control.ChoiceDialog<>(userList.get(0), userList);
+		dialog.setTitle("Delete User");
+		dialog.setHeaderText("Select User to Delete");
+		dialog.setContentText("Choose user:");
+
+		java.util.Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String selectedUser = result.get();
+
+			// Confirmation dialog
+			javafx.scene.control.Alert confirmAlert =
+				new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+			confirmAlert.setTitle("Confirm Delete");
+			confirmAlert.setHeaderText("Delete User: " + selectedUser);
+			confirmAlert.setContentText("Are you sure you want to delete this user?");
+
+			java.util.Optional<javafx.scene.control.ButtonType> confirmResult = confirmAlert.showAndWait();
+			if (confirmResult.isPresent() &&
+				confirmResult.get() == javafx.scene.control.ButtonType.OK) {
+
+				boolean success = theDatabase.deleteUser(selectedUser);
+
+				if (success) {
+					ViewAdminHome.alertNotImplemented.setTitle("Success");
+					ViewAdminHome.alertNotImplemented.setHeaderText("User Deleted");
+					ViewAdminHome.alertNotImplemented.setContentText(
+						"User " + selectedUser + " has been deleted.");
+					ViewAdminHome.label_NumberOfUsers.setText(
+						"Number of users: " + theDatabase.getNumberOfUsers());
+				} else {
+					ViewAdminHome.alertNotImplemented.setTitle("Error");
+					ViewAdminHome.alertNotImplemented.setHeaderText("Delete Failed");
+					ViewAdminHome.alertNotImplemented.setContentText(
+						"Could not delete user. You cannot delete your own account or the last admin.");
+				}
+				ViewAdminHome.alertNotImplemented.showAndWait();
+			}
+		}
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: listUsers () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that displays all users in the system with their
+	 * details including username, name, email, and roles. </p>
 	 */
 	protected static void listUsers() {
-		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("List User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("List Users Not Yet Implemented");
+		java.util.List<Database.UserDetails> users = theDatabase.getAllUserDetails();
+
+		StringBuilder userList = new StringBuilder();
+		userList.append("Total Users: ").append(users.size()).append("\n\n");
+
+		for (Database.UserDetails user : users) {
+			userList.append("Username: ").append(user.username).append("\n");
+			userList.append("Name: ").append(user.firstName).append(" ");
+			if (user.middleName != null && !user.middleName.isEmpty()) {
+				userList.append(user.middleName).append(" ");
+			}
+			userList.append(user.lastName).append("\n");
+			userList.append("Email: ").append(user.email).append("\n");
+
+			java.util.List<String> roles = new java.util.ArrayList<>();
+			if (user.adminRole) roles.add("Admin");
+			if (user.role1) roles.add("Student");
+			if (user.role2) roles.add("Staff");
+			userList.append("Roles: ").append(String.join(", ", roles)).append("\n");
+			userList.append("----------------------------------------\n");
+		}
+
+		ViewAdminHome.alertNotImplemented.setTitle("User List");
+		ViewAdminHome.alertNotImplemented.setHeaderText("All Users in System");
+		ViewAdminHome.alertNotImplemented.setContentText(userList.toString());
 		ViewAdminHome.alertNotImplemented.showAndWait();
 	}
 	
@@ -166,21 +278,21 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: invalidEmailAddress () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is intended to check an email address before it is
-	 * used to reduce errors.  The code currently only checks to see that the email address is not
-	 * empty.  In the future, a syntactic check must be performed and maybe there is a way to check
-	 * if a properly email address is active.</p>
-	 * 
+	 *
+	 * <p> Description: Protected method that validates an email address using the EmailRecognizer
+	 * to ensure proper format before use.</p>
+	 *
 	 * @param emailAddress	This String holds what is expected to be an email address
 	 */
 	protected static boolean invalidEmailAddress(String emailAddress) {
-		if (emailAddress.length() == 0) {
+		String validationError = emailRecognizer.EmailRecognizer.checkEmailAddress(emailAddress);
+
+		if (!validationError.isEmpty()) {
 			ViewAdminHome.alertEmailError.setContentText(
-					"Correct the email address and try again.");
+					"Invalid email address:\n" + validationError);
 			ViewAdminHome.alertEmailError.showAndWait();
 			return true;
 		}

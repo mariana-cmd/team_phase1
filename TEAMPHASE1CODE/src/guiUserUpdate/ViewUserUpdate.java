@@ -3,10 +3,12 @@ package guiUserUpdate;
 import java.util.Optional;
 
 import NameRecognizer.NameRecognizer;
+import NameRecognizer.PasswordRecognizer;
 import emailRecognizer.EmailRecognizer;
 import database.Database;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -98,6 +100,7 @@ public class ViewUserUpdate {
 	
 	// These are the set of pop-up dialog boxes that are used to enable the user to change the
 	// the values of the various account detail items.
+	private static TextInputDialog dialogUpdatePassword;
 	private static TextInputDialog dialogUpdateFirstName;
 	private static TextInputDialog dialogUpdateMiddleName;
 	private static TextInputDialog dialogUpdateLastName;
@@ -217,6 +220,7 @@ public class ViewUserUpdate {
 		theUserUpdateScene = new Scene(theRootPane, width, height);
 
 		// Initialize the pop-up dialogs to an empty text filed.
+		dialogUpdatePassword = new TextInputDialog("");
 		dialogUpdateFirstName = new TextInputDialog("");
 		dialogUpdateMiddleName = new TextInputDialog("");
 		dialogUpdateLastName = new TextInputDialog("");
@@ -224,18 +228,21 @@ public class ViewUserUpdate {
 		dialogUpdateEmailAddresss = new TextInputDialog("");
 
 		// Establish the label for each of the dialogs.
+		dialogUpdatePassword.setTitle("Update Password");
+		dialogUpdatePassword.setHeaderText("Update your Password");
+
 		dialogUpdateFirstName.setTitle("Update First Name");
 		dialogUpdateFirstName.setHeaderText("Update your First Name");
-		
+
 		dialogUpdateMiddleName.setTitle("Update Middle Name");
 		dialogUpdateMiddleName.setHeaderText("Update your Middle Name");
-		
+
 		dialogUpdateLastName.setTitle("Update Last Name");
 		dialogUpdateLastName.setHeaderText("Update your Last Name");
-		
+
 		dialogUpdatePreferredFirstName.setTitle("Update Preferred First Name");
 		dialogUpdatePreferredFirstName.setHeaderText("Update your Preferred First Name");
-		
+
 		dialogUpdateEmailAddresss.setTitle("Update Email Address");
 		dialogUpdateEmailAddresss.setHeaderText("Update your Email Address");
 
@@ -257,7 +264,35 @@ public class ViewUserUpdate {
         setupLabelUI(label_Password, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 150);
         setupLabelUI(label_CurrentPassword, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 150);
         setupButtonUI(button_UpdatePassword, "Dialog", 18, 275, Pos.CENTER, 500, 143);
-        
+        button_UpdatePassword.setOnAction((_) -> {result = dialogUpdatePassword.showAndWait();
+        	result.ifPresent(_ -> {
+        		String newPassword = result.get();
+        		String validationError = PasswordRecognizer.checkPassword(newPassword);
+        		if (validationError.isEmpty()) {
+        			// Check if this was a one-time password BEFORE updating
+        			boolean wasOneTimePassword = theDatabase.getCurrentOneTimePassword();
+        			theDatabase.updatePassword(theUser.getUserName(), newPassword);
+        			theUser.setPassword(newPassword);
+        			label_CurrentPassword.setText(newPassword);
+        			// If this was a one-time password login, log out after password change
+        			if (wasOneTimePassword) {
+        				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        				alert.setTitle("Password Updated");
+        				alert.setHeaderText(null);
+        				alert.setContentText("Your password has been updated successfully. Please log in again.");
+        				alert.showAndWait();
+        				guiUserLogin.ViewUserLogin.displayUserLogin(theStage);
+        			}
+        		} else {
+        			Alert alert = new Alert(Alert.AlertType.ERROR);
+        			alert.setTitle("Invalid Password");
+        			alert.setHeaderText(null);
+        			alert.setContentText(validationError);
+        			alert.showAndWait();
+        		}
+        	});
+        });
+
         // First Name
         setupLabelUI(label_FirstName, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 200);
         setupLabelUI(label_CurrentFirstName, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 200);

@@ -6,6 +6,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -85,6 +87,8 @@ public class ViewAddRemoveRoles {
 	protected static Button button_Logout = new Button("Logout");
 	protected static Button button_Quit = new Button("Quit");
 
+	protected static Alert alertError = new Alert(AlertType.ERROR);
+
 	// This is the end of the GUI objects for the page.
 	
 	// These attributes are used to configure the page and populate it with this user's information
@@ -137,17 +141,21 @@ public class ViewAddRemoveRoles {
 		theStage = ps;
 		theUser = user;
 		
-		// If not yet established, populate the static aspects of the GUI by creating the 
+		// If not yet established, populate the static aspects of the GUI by creating the
 		// singleton instance of this class
 		if (theView == null) theView = new ViewAddRemoveRoles();
-		
+
+		// Refresh the user list
+		List<String> userList = theDatabase.getUserList();
+		combobox_SelectUser.setItems(FXCollections.observableArrayList(userList));
+
 		// Default to no user selected
 		combobox_SelectUser.getSelectionModel().select(0);
-		
+
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
-		// state of the system.  This page is different from the others.  Since there are two 
+		// state of the system.  This page is different from the others.  Since there are two
 		// modes (1: user has not been selected, and 2: user has been selected) there are two
-		// lists of widgets to be displayed.  For this reason, we have implemented the following 
+		// lists of widgets to be displayed.  For this reason, we have implemented the following
 		// two controller methods to deal with this dynamic aspect.
 		ControllerAddRemoveRoles.repaintTheWindow();
 		ControllerAddRemoveRoles.doSelectUser();
