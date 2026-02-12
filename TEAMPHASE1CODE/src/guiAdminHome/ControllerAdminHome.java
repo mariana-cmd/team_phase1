@@ -119,19 +119,70 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: deleteUser () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that allows an admin to delete a user account
+	 * with confirmation and safeguards. </p>
 	 */
 	protected static void deleteUser() {
-		System.out.println("\n*** WARNING ***: Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("Delete User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("Delete User Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+		// Get list of users
+		java.util.List<String> userList = theDatabase.getUserList();
+
+		// Remove the placeholder
+		if (!userList.isEmpty() && userList.get(0).equals("<Select a User>")) {
+			userList.remove(0);
+		}
+
+		if (userList.isEmpty()) {
+			ViewAdminHome.alertNotImplemented.setTitle("No Users");
+			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Delete");
+			ViewAdminHome.alertNotImplemented.setContentText("No users available to delete.");
+			ViewAdminHome.alertNotImplemented.showAndWait();
+			return;
+		}
+
+		// Create selection dialog
+		javafx.scene.control.ChoiceDialog<String> dialog =
+			new javafx.scene.control.ChoiceDialog<>(userList.get(0), userList);
+		dialog.setTitle("Delete User");
+		dialog.setHeaderText("Select User to Delete");
+		dialog.setContentText("Choose user:");
+
+		java.util.Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String selectedUser = result.get();
+
+			// Confirmation dialog
+			javafx.scene.control.Alert confirmAlert =
+				new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+			confirmAlert.setTitle("Confirm Delete");
+			confirmAlert.setHeaderText("Delete User: " + selectedUser);
+			confirmAlert.setContentText("Are you sure you want to delete this user?");
+
+			java.util.Optional<javafx.scene.control.ButtonType> confirmResult = confirmAlert.showAndWait();
+			if (confirmResult.isPresent() &&
+				confirmResult.get() == javafx.scene.control.ButtonType.OK) {
+
+				boolean success = theDatabase.deleteUser(selectedUser);
+
+				if (success) {
+					ViewAdminHome.alertNotImplemented.setTitle("Success");
+					ViewAdminHome.alertNotImplemented.setHeaderText("User Deleted");
+					ViewAdminHome.alertNotImplemented.setContentText(
+						"User " + selectedUser + " has been deleted.");
+					ViewAdminHome.label_NumberOfUsers.setText(
+						"Number of users: " + theDatabase.getNumberOfUsers());
+				} else {
+					ViewAdminHome.alertNotImplemented.setTitle("Error");
+					ViewAdminHome.alertNotImplemented.setHeaderText("Delete Failed");
+					ViewAdminHome.alertNotImplemented.setContentText(
+						"Could not delete user. You cannot delete your own account or the last admin.");
+				}
+				ViewAdminHome.alertNotImplemented.showAndWait();
+			}
+		}
 	}
 	
 	/**********

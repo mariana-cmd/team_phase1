@@ -1159,12 +1159,49 @@ public class Database {
 		resultSet.close();
 	}
 
+	/*******
+	 * <p> Method: boolean deleteUser(String username)</p>
+	 *
+	 * <p> Description: Deletes a user account from the database with safeguards.</p>
+	 *
+	 * @param username the username of the account to delete
+	 *
+	 * @return true if deletion was successful, false otherwise
+	 *
+	 */
+	public boolean deleteUser(String username) {
+		// Safeguard 1: Cannot delete own account
+		if (username.equals(currentUsername)) {
+			System.err.println("Cannot delete own account");
+			return false;
+		}
+
+		// Safeguard 2: Check if this is an admin and if they're the last admin
+		if (getUserAccountDetails(username)) {
+			if (getCurrentAdminRole() && getAdminCount() <= 1) {
+				System.err.println("Cannot delete last admin");
+				return false;
+			}
+		}
+
+		// Delete the user
+		String query = "DELETE FROM userDB WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, username);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 
 	/*******
 	 * <p> Method: void closeConnection()</p>
-	 * 
+	 *
 	 * <p> Description: Closes the database statement and connection.</p>
-	 * 
+	 *
 	 */
 	// Closes the database statement and connection.
 	public void closeConnection() {
