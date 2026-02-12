@@ -187,21 +187,21 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: invalidEmailAddress () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is intended to check an email address before it is
-	 * used to reduce errors.  The code currently only checks to see that the email address is not
-	 * empty.  In the future, a syntactic check must be performed and maybe there is a way to check
-	 * if a properly email address is active.</p>
-	 * 
+	 *
+	 * <p> Description: Protected method that validates an email address using the EmailRecognizer
+	 * to ensure proper format before use.</p>
+	 *
 	 * @param emailAddress	This String holds what is expected to be an email address
 	 */
 	protected static boolean invalidEmailAddress(String emailAddress) {
-		if (emailAddress.length() == 0) {
+		String validationError = emailRecognizer.EmailRecognizer.checkEmailAddress(emailAddress);
+
+		if (!validationError.isEmpty()) {
 			ViewAdminHome.alertEmailError.setContentText(
-					"Correct the email address and try again.");
+					"Invalid email address:\n" + validationError);
 			ViewAdminHome.alertEmailError.showAndWait();
 			return true;
 		}
