@@ -6,6 +6,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -84,6 +86,8 @@ public class ViewAddRemoveRoles {
 	protected static Button button_Return = new Button("Return");
 	protected static Button button_Logout = new Button("Logout");
 	protected static Button button_Quit = new Button("Quit");
+
+	protected static Alert alertError = new Alert(AlertType.ERROR);
 
 	// This is the end of the GUI objects for the page.
 	
