@@ -135,18 +135,39 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: listUsers () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that displays all users in the system with their
+	 * details including username, name, email, and roles. </p>
 	 */
 	protected static void listUsers() {
-		System.out.println("\n*** WARNING ***: List Users Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("List User Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("List Users Not Yet Implemented");
+		java.util.List<Database.UserDetails> users = theDatabase.getAllUserDetails();
+
+		StringBuilder userList = new StringBuilder();
+		userList.append("Total Users: ").append(users.size()).append("\n\n");
+
+		for (Database.UserDetails user : users) {
+			userList.append("Username: ").append(user.username).append("\n");
+			userList.append("Name: ").append(user.firstName).append(" ");
+			if (user.middleName != null && !user.middleName.isEmpty()) {
+				userList.append(user.middleName).append(" ");
+			}
+			userList.append(user.lastName).append("\n");
+			userList.append("Email: ").append(user.email).append("\n");
+
+			java.util.List<String> roles = new java.util.ArrayList<>();
+			if (user.adminRole) roles.add("Admin");
+			if (user.role1) roles.add("Student");
+			if (user.role2) roles.add("Staff");
+			userList.append("Roles: ").append(String.join(", ", roles)).append("\n");
+			userList.append("----------------------------------------\n");
+		}
+
+		ViewAdminHome.alertNotImplemented.setTitle("User List");
+		ViewAdminHome.alertNotImplemented.setHeaderText("All Users in System");
+		ViewAdminHome.alertNotImplemented.setContentText(userList.toString());
 		ViewAdminHome.alertNotImplemented.showAndWait();
 	}
 	
