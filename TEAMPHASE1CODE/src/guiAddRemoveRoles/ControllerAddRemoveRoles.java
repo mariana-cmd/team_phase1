@@ -230,30 +230,52 @@ public class ControllerAddRemoveRoles {
 	
 	/**********
 	 * <p> Method: performRemoveRole() </p>
-	 * 
-	 * <p> Description: This method removes an existing role to the list of role in the ComboBox
-	 * select list. </p>
-	 * 
+	 *
+	 * <p> Description: This method removes an existing role from a user with proper
+	 * validation and error handling for admin role safeguards. </p>
+	 *
 	 */
 	protected static void performRemoveRole() {
-		
+
 		// Determine which item in the ComboBox list was selected
 		ViewAddRemoveRoles.theRemoveRole = (String) ViewAddRemoveRoles.
 				combobox_SelectRoleToRemove.getValue();
-		
+
 		// If the selection is the list header (e.g., "<Select a role>") don't do anything
 		if (ViewAddRemoveRoles.theRemoveRole.compareTo("<Select a role>") != 0) {
-			
-			// If an actual role was selected, update the database entry for that user for the role
-			if (theDatabase.updateUserRole(ViewAddRemoveRoles.theSelectedUser, 
-					ViewAddRemoveRoles.theRemoveRole, "false") ) {
+
+			// Attempt to update the database entry for that user for the role
+			boolean success = theDatabase.updateUserRole(ViewAddRemoveRoles.theSelectedUser,
+					ViewAddRemoveRoles.theRemoveRole, "false");
+
+			if (success) {
+				// Role removed successfully
 				ViewAddRemoveRoles.combobox_SelectRoleToRemove = new ComboBox <String>();
 				ViewAddRemoveRoles.combobox_SelectRoleToRemove.setItems(FXCollections.
 					observableArrayList(ViewAddRemoveRoles.addList));
 				ViewAddRemoveRoles.combobox_SelectRoleToRemove.getSelectionModel().
-					clearAndSelect(0);		
+					clearAndSelect(0);
 				setupSelectedUser();
-			}				
+			} else {
+				// Role removal failed - show appropriate error message
+				ViewAddRemoveRoles.alertError.setTitle("Cannot Remove Role");
+				ViewAddRemoveRoles.alertError.setHeaderText("Role Removal Failed");
+
+				// Determine which safeguard triggered
+				if (ViewAddRemoveRoles.theSelectedUser.equals(theDatabase.getCurrentUsername()) &&
+					ViewAddRemoveRoles.theRemoveRole.equals("Admin")) {
+					ViewAddRemoveRoles.alertError.setContentText(
+						"You cannot remove the Admin role from your own account.");
+				} else if (theDatabase.getAdminCount() <= 1 &&
+						   ViewAddRemoveRoles.theRemoveRole.equals("Admin")) {
+					ViewAddRemoveRoles.alertError.setContentText(
+						"Cannot remove Admin role - at least one Admin must exist in the system.");
+				} else {
+					ViewAddRemoveRoles.alertError.setContentText(
+						"Role removal failed. Please try again.");
+				}
+				ViewAddRemoveRoles.alertError.showAndWait();
+			}
 		}
 	}
 	
