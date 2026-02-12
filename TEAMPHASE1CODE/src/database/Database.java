@@ -59,6 +59,7 @@ public class Database {
 	private boolean currentAdminRole;
 	private boolean currentNewRole1;
 	private boolean currentNewRole2;
+	private boolean currentOneTimePassword;
 
 	/*******
 	 * <p> Method: Database </p>
@@ -132,7 +133,8 @@ public class Database {
 				+ "emailAddress VARCHAR(255), "
 				+ "adminRole BOOL DEFAULT FALSE, "
 				+ "newRole1 BOOL DEFAULT FALSE, "
-				+ "newRole2 BOOL DEFAULT FALSE)";
+				+ "newRole2 BOOL DEFAULT FALSE, "
+				+ "oneTimePassword BOOL DEFAULT FALSE)";
 		statement.execute(userTable);
 		
 		// Create the invitation codes table
@@ -698,7 +700,32 @@ public class Database {
 	    }
 	}
 
-	
+
+	/*******
+	 * <p> Method: void updatePassword(String username, String password) </p>
+	 *
+	 * <p> Description: Update the password of a user and clear the one-time password flag.</p>
+	 *
+	 * @param username is the username of the user
+	 *
+	 * @param password is the new password for the user
+	 *
+	 */
+	public void updatePassword(String username, String password) {
+	    String query = "UPDATE userDB SET password = ?, oneTimePassword = ? WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, password);
+	        pstmt.setBoolean(2, false);
+	        pstmt.setString(3, username);
+	        pstmt.executeUpdate();
+	        currentPassword = password;
+	        currentOneTimePassword = false;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
 	/*******
 	 * <p> Method: String getMiddleName(String username) </p>
 	 * 
@@ -936,6 +963,7 @@ public class Database {
 	    	currentAdminRole = rs.getBoolean(9);
 	    	currentNewRole1 = rs.getBoolean(10);
 	    	currentNewRole2 = rs.getBoolean(11);
+	    	currentOneTimePassword = rs.getBoolean(12);
 			return true;
 	    } catch (SQLException e) {
 			return false;
@@ -1126,22 +1154,33 @@ public class Database {
 	
 	/*******
 	 * <p> Method: boolean getCurrentNewRole2() </p>
-	 * 
+	 *
 	 * <p> Description: Get the current user's Reviewer role attribute.</p>
-	 * 
+	 *
 	 * @return true if this user plays a Reviewer role, else false
-	 *  
+	 *
 	 */
 	public boolean getCurrentNewRole2() { return currentNewRole2;};
 
-	
+
+	/*******
+	 * <p> Method: boolean getCurrentOneTimePassword() </p>
+	 *
+	 * <p> Description: Get the current user's one-time password flag.</p>
+	 *
+	 * @return true if this user is using a one-time password, else false
+	 *
+	 */
+	public boolean getCurrentOneTimePassword() { return currentOneTimePassword;};
+
+
 	/*******
 	 * <p> Debugging method</p>
-	 * 
+	 *
 	 * <p> Description: Debugging method that dumps the database of the console.</p>
-	 * 
+	 *
 	 * @throws SQLException if there is an issues accessing the database.
-	 * 
+	 *
 	 */
 	// Dumps the database.
 	public void dump() throws SQLException {
@@ -1188,6 +1227,58 @@ public class Database {
 		String query = "DELETE FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
+			int rowsAffected = pstmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/*******
+	 * <p> Method: String generateOneTimePassword(String username)</p>
+	 *
+	 * <p> Description: Generates a one-time password for the specified user.</p>
+	 *
+	 * @param username the username for which to generate a one-time password
+	 * @return the generated one-time password, or null if failed
+	 *
+	 */
+	public String generateOneTimePassword(String username) {
+		// Generate a random 8-character password
+		String oneTimePass = UUID.randomUUID().toString().substring(0, 8);
+
+		String query = "UPDATE userDB SET password = ?, oneTimePassword = ? WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setString(1, oneTimePass);
+			pstmt.setBoolean(2, true);
+			pstmt.setString(3, username);
+			int rowsAffected = pstmt.executeUpdate();
+			if (rowsAffected > 0) {
+				return oneTimePass;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	/*******
+	 * <p> Method: boolean clearOneTimePasswordFlag(String username)</p>
+	 *
+	 * <p> Description: Clears the one-time password flag for the specified user.</p>
+	 *
+	 * @param username the username for which to clear the one-time password flag
+	 * @return true if successful, else false
+	 *
+	 */
+	public boolean clearOneTimePasswordFlag(String username) {
+		String query = "UPDATE userDB SET oneTimePassword = ? WHERE userName = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			pstmt.setBoolean(1, false);
+			pstmt.setString(2, username);
 			int rowsAffected = pstmt.executeUpdate();
 			return rowsAffected > 0;
 		} catch (SQLException e) {

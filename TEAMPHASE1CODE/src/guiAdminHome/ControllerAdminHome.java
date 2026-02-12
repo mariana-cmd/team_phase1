@@ -103,19 +103,59 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p>
+	 *
 	 * Title: setOnetimePassword () Method. </p>
-	 * 
-	 * <p> Description: Protected method that is currently a stub informing the user that
-	 * this function has not yet been implemented. </p>
+	 *
+	 * <p> Description: Protected method that allows an admin to set a one-time password
+	 * for a user account. The user will be required to change this password on next login. </p>
 	 */
 	protected static void setOnetimePassword () {
-		System.out.println("\n*** WARNING ***: One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
-		ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Issue");
-		ViewAdminHome.alertNotImplemented.setContentText("One-Time Password Not Yet Implemented");
-		ViewAdminHome.alertNotImplemented.showAndWait();
+		// Get list of users
+		java.util.List<String> userList = theDatabase.getUserList();
+
+		// Remove the placeholder
+		if (!userList.isEmpty() && userList.get(0).equals("<Select a User>")) {
+			userList.remove(0);
+		}
+
+		if (userList.isEmpty()) {
+			ViewAdminHome.alertNotImplemented.setTitle("No Users");
+			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Set Password");
+			ViewAdminHome.alertNotImplemented.setContentText("No users available.");
+			ViewAdminHome.alertNotImplemented.showAndWait();
+			return;
+		}
+
+		// Create selection dialog
+		javafx.scene.control.ChoiceDialog<String> dialog =
+			new javafx.scene.control.ChoiceDialog<>(userList.get(0), userList);
+		dialog.setTitle("Set One-Time Password");
+		dialog.setHeaderText("Select User");
+		dialog.setContentText("Choose user:");
+
+		java.util.Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String selectedUser = result.get();
+
+			// Generate one-time password
+			String oneTimePass = theDatabase.generateOneTimePassword(selectedUser);
+
+			if (oneTimePass != null) {
+				ViewAdminHome.alertNotImplemented.setTitle("Success");
+				ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Set");
+				ViewAdminHome.alertNotImplemented.setContentText(
+					"One-time password for " + selectedUser + ": " + oneTimePass +
+					"\n\nThe user will be required to change this password upon next login.");
+				System.out.println("One-time password set for " + selectedUser + ": " + oneTimePass);
+			} else {
+				ViewAdminHome.alertNotImplemented.setTitle("Error");
+				ViewAdminHome.alertNotImplemented.setHeaderText("Failed");
+				ViewAdminHome.alertNotImplemented.setContentText(
+					"Could not set one-time password.");
+			}
+			ViewAdminHome.alertNotImplemented.showAndWait();
+		}
 	}
 	
 	/**********

@@ -81,7 +81,7 @@ public class ControllerUserLogin {
 		
 		// Check to see that the login password matches the account password
     	String actualPassword = theDatabase.getCurrentPassword();
-    	
+
     	if (password.compareTo(actualPassword) != 0) {
     		ViewUserLogin.alertUsernamePasswordError.setContentText(
     				"Incorrect username/password. Try again!");
@@ -89,14 +89,23 @@ public class ControllerUserLogin {
     		return;
     	}
 		// System.out.println("*** Password is valid for this user");
-		
+
 		// Establish this user's details
-    	User user = new User(username, password, theDatabase.getCurrentFirstName(), 
-    			theDatabase.getCurrentMiddleName(), theDatabase.getCurrentLastName(), 
-    			theDatabase.getCurrentPreferredFirstName(), theDatabase.getCurrentEmailAddress(), 
-    			theDatabase.getCurrentAdminRole(), 
+    	User user = new User(username, password, theDatabase.getCurrentFirstName(),
+    			theDatabase.getCurrentMiddleName(), theDatabase.getCurrentLastName(),
+    			theDatabase.getCurrentPreferredFirstName(), theDatabase.getCurrentEmailAddress(),
+    			theDatabase.getCurrentAdminRole(),
     			theDatabase.getCurrentNewRole1(), theDatabase.getCurrentNewRole2());
-    	
+
+    	// Check if user is using a one-time password
+    	if (theDatabase.getCurrentOneTimePassword()) {
+    		ViewUserLogin.alertUsernamePasswordError.setContentText(
+    				"You are using a one-time password. You must change your password before continuing.");
+    		ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    		guiUserUpdate.ViewUserUpdate.displayUserUpdate(theStage, user);
+    		return;
+    	}
+
     	// See which home page dispatch to use
 		int numberOfRoles = theDatabase.getNumberOfRoles(user);		
 		// System.out.println("*** The number of roles: "+ numberOfRoles);
