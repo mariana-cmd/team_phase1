@@ -68,10 +68,27 @@ public class Database {
 	 */
 	
 	public Database () {
-		
+
 	}
-	
-	
+
+	/*******
+	 * <p> Class: UserDetails </p>
+	 *
+	 * <p> Description: Helper class to hold complete user information for listing users.</p>
+	 */
+	public static class UserDetails {
+		public String username;
+		public String firstName;
+		public String middleName;
+		public String lastName;
+		public String preferredFirstName;
+		public String email;
+		public boolean adminRole;
+		public boolean role1;
+		public boolean role2;
+	}
+
+
 /*******
  * <p> Method: connectToDatabase </p>
  * 
@@ -171,6 +188,27 @@ public class Database {
 	}
 
 /*******
+ * <p> Method: getAdminCount </p>
+ *
+ * <p> Description: Returns the number of users with admin role. </p>
+ *
+ * @return the number of admin users in the database.
+ *
+ */
+	public int getAdminCount() {
+		String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
+		try {
+			ResultSet resultSet = statement.executeQuery(query);
+			if (resultSet.next()) {
+				return resultSet.getInt("count");
+			}
+		} catch (SQLException e) {
+			return 0;
+		}
+		return 0;
+	}
+
+/*******
  * <p> Method: register(User user) </p>
  * 
  * <p> Description: Creates a new row in the database using the user parameter. </p>
@@ -242,6 +280,38 @@ public class Database {
 	    }
 //		System.out.println(userList);
 		return userList;
+	}
+
+/*******
+ *  <p> Method: List<UserDetails> getAllUserDetails() </p>
+ *
+ *  <P> Description: Get complete details for all users in the database. </p>
+ *
+ *  @return a list of UserDetails objects containing all user information.
+ */
+	public List<UserDetails> getAllUserDetails() {
+		List<UserDetails> userDetailsList = new ArrayList<>();
+		String query = "SELECT userName, firstName, middleName, lastName, preferredFirstName, " +
+					   "emailAddress, adminRole, newRole1, newRole2 FROM userDB";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				UserDetails details = new UserDetails();
+				details.username = rs.getString("userName");
+				details.firstName = rs.getString("firstName");
+				details.middleName = rs.getString("middleName");
+				details.lastName = rs.getString("lastName");
+				details.preferredFirstName = rs.getString("preferredFirstName");
+				details.email = rs.getString("emailAddress");
+				details.adminRole = rs.getBoolean("adminRole");
+				details.role1 = rs.getBoolean("newRole1");
+				details.role2 = rs.getBoolean("newRole2");
+				userDetailsList.add(details);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return userDetailsList;
 	}
 
 /*******
@@ -857,6 +927,21 @@ public class Database {
 	// Update a users role
 	public boolean updateUserRole(String username, String role, String value) {
 		if (role.compareTo("Admin") == 0) {
+			// Safeguards when removing admin role
+			if (value.compareTo("false") == 0) {
+				// Safeguard 1: Cannot remove admin role from own account
+				if (username.equals(currentUsername)) {
+					System.err.println("Cannot remove admin role from own account");
+					return false;
+				}
+
+				// Safeguard 2: Must maintain at least one admin
+				if (getAdminCount() <= 1) {
+					System.err.println("Cannot remove last admin from system");
+					return false;
+				}
+			}
+
 			String query = "UPDATE userDB SET adminRole = ? WHERE username = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setString(1, value);
