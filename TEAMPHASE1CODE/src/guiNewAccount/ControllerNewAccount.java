@@ -133,8 +133,7 @@ public class ControllerNewAccount {
             }
             
             // The account has been set, so remove the invitation from the system
-            theDatabase.removeInvitationAfterUse(
-            		ViewNewAccount.text_Invitation.getText());
+            theDatabase.removeInvitationAfterUse(ViewNewAccount.theInvitationCode);
             
             // Set the database so it has this user and the current user
             theDatabase.getUserAccountDetails(username);

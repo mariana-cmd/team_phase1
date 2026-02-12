@@ -487,17 +487,19 @@ public class Database {
 	
 	/*******
 	 * <p> Method: int getNumberOfInvitations() </p>
-	 * 
-	 * <p> Description: Determine the number of outstanding invitations in the table.</p>
-	 *  
-	 * @return the number of invitations in the table.
-	 * 
+	 *
+	 * <p> Description: Determine the number of outstanding (non-expired) invitations in the table.</p>
+	 *
+	 * @return the number of non-expired invitations in the table.
+	 *
 	 */
-	// Number of invitations in the database
+	// Number of non-expired invitations in the database
 	public int getNumberOfInvitations() {
-		String query = "SELECT COUNT(*) AS count FROM InvitationCodes";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
+		String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE deadline > ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+			Timestamp now = new Timestamp(System.currentTimeMillis());
+			pstmt.setTimestamp(1, now);
+			ResultSet resultSet = pstmt.executeQuery();
 			if (resultSet.next()) {
 				return resultSet.getInt("count");
 			}
@@ -624,24 +626,13 @@ public class Database {
 	 */
 	// Remove an invitation using an email address once the user account has been setup
 	public void removeInvitationAfterUse(String code) {
-	    String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE code = ?";
+	    String query = "DELETE FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	        	int counter = rs.getInt(1);
-	            // Only do the remove if the code is still in the invitation table
-	        	if (counter > 0) {
-        			query = "DELETE FROM InvitationCodes WHERE code = ?";
-	        		try (PreparedStatement pstmt2 = connection.prepareStatement(query)) {
-	        			pstmt2.setString(1, code);
-	        			pstmt2.executeUpdate();
-	        		}catch (SQLException e) {
-	        	        e.printStackTrace();
-	        	    }
-	        	}
-	        }
+	        int rowsDeleted = pstmt.executeUpdate();
+	        System.out.println("Removed invitation code: " + code + " (rows deleted: " + rowsDeleted + ")");
 	    } catch (SQLException e) {
+	        System.err.println("Error removing invitation code: " + code);
 	        e.printStackTrace();
 	    }
 		return;

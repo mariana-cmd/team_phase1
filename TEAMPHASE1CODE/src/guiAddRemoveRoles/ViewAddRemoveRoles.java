@@ -141,17 +141,21 @@ public class ViewAddRemoveRoles {
 		theStage = ps;
 		theUser = user;
 		
-		// If not yet established, populate the static aspects of the GUI by creating the 
+		// If not yet established, populate the static aspects of the GUI by creating the
 		// singleton instance of this class
 		if (theView == null) theView = new ViewAddRemoveRoles();
-		
+
+		// Refresh the user list
+		List<String> userList = theDatabase.getUserList();
+		combobox_SelectUser.setItems(FXCollections.observableArrayList(userList));
+
 		// Default to no user selected
 		combobox_SelectUser.getSelectionModel().select(0);
-		
+
 		// Populate the dynamic aspects of the GUI with the data from the user and the current
-		// state of the system.  This page is different from the others.  Since there are two 
+		// state of the system.  This page is different from the others.  Since there are two
 		// modes (1: user has not been selected, and 2: user has been selected) there are two
-		// lists of widgets to be displayed.  For this reason, we have implemented the following 
+		// lists of widgets to be displayed.  For this reason, we have implemented the following
 		// two controller methods to deal with this dynamic aspect.
 		ControllerAddRemoveRoles.repaintTheWindow();
 		ControllerAddRemoveRoles.doSelectUser();

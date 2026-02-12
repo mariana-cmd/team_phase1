@@ -3,10 +3,12 @@ package guiUserUpdate;
 import java.util.Optional;
 
 import NameRecognizer.NameRecognizer;
+import NameRecognizer.PasswordRecognizer;
 import emailRecognizer.EmailRecognizer;
 import database.Database;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -265,15 +267,16 @@ public class ViewUserUpdate {
         button_UpdatePassword.setOnAction((_) -> {result = dialogUpdatePassword.showAndWait();
         	result.ifPresent(_ -> {
         		String newPassword = result.get();
-        		String validationError = NameRecognizer.PasswordRecognizer.checkPassword(newPassword);
+        		String validationError = PasswordRecognizer.checkPassword(newPassword);
         		if (validationError.isEmpty()) {
+        			// Check if this was a one-time password BEFORE updating
+        			boolean wasOneTimePassword = theDatabase.getCurrentOneTimePassword();
         			theDatabase.updatePassword(theUser.getUserName(), newPassword);
         			theUser.setPassword(newPassword);
         			label_CurrentPassword.setText(newPassword);
         			// If this was a one-time password login, log out after password change
-        			if (theDatabase.getCurrentOneTimePassword() == false) {
-        				javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-        					javafx.scene.control.Alert.AlertType.INFORMATION);
+        			if (wasOneTimePassword) {
+        				Alert alert = new Alert(Alert.AlertType.INFORMATION);
         				alert.setTitle("Password Updated");
         				alert.setHeaderText(null);
         				alert.setContentText("Your password has been updated successfully. Please log in again.");
@@ -281,8 +284,7 @@ public class ViewUserUpdate {
         				guiUserLogin.ViewUserLogin.displayUserLogin(theStage);
         			}
         		} else {
-        			javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-        				javafx.scene.control.Alert.AlertType.ERROR);
+        			Alert alert = new Alert(Alert.AlertType.ERROR);
         			alert.setTitle("Invalid Password");
         			alert.setHeaderText(null);
         			alert.setContentText(validationError);
