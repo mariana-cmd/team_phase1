@@ -75,13 +75,23 @@ public class ControllerNewAccount {
 		
 		// Display key information to the log
 		System.out.println("** Account for Username: " + username + "; theInvitationCode: "+
-				ViewNewAccount.theInvitationCode + "; email address: " + 
+				ViewNewAccount.theInvitationCode + "; email address: " +
 				ViewNewAccount.emailAddress + "; Role: " + ViewNewAccount.theRole);
-		
+
+		// Check if invitation code has expired
+		if (theDatabase.isInvitationCodeExpired(ViewNewAccount.theInvitationCode)) {
+			ViewNewAccount.alertUsernamePasswordError.setTitle("Invitation Expired");
+			ViewNewAccount.alertUsernamePasswordError.setHeaderText(null);
+			ViewNewAccount.alertUsernamePasswordError.setContentText(
+				"This invitation code has expired. Please contact an administrator for a new invitation.");
+			ViewNewAccount.alertUsernamePasswordError.showAndWait();
+			return;
+		}
+
 		// Initialize local variables that will be created during this process
 		int roleCode = 0;
 		User user = null;
-		
+
 		String userValidation = UserNameRecognizer.checkForValidUserName(username);
 		String passValidation = PasswordRecognizer.checkPassword(password);
 

@@ -139,7 +139,8 @@ public class Database {
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	    		+ "emailAddress VARCHAR(255), "
-	            + "role VARCHAR(10))";
+	            + "role VARCHAR(10), "
+	            + "deadline TIMESTAMP)";
 	    statement.execute(invitationCodesTable);
 	}
 
@@ -461,12 +462,19 @@ public class Database {
 	// Generates a new invitation code and inserts it into the database.
 	public String generateInvitationCode(String emailAddress, String role) {
 	    String code = UUID.randomUUID().toString().substring(0, 6); // Generate a random 6-character code
-	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role) VALUES (?, ?, ?)";
+
+	    // Set deadline to 7 days from now
+	    long currentTime = System.currentTimeMillis();
+	    long sevenDays = 7 * 24 * 60 * 60 * 1000L; // 7 days in milliseconds
+	    Timestamp deadline = new Timestamp(currentTime + sevenDays);
+
+	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role, deadline) VALUES (?, ?, ?, ?)";
 
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.setString(2, emailAddress);
 	        pstmt.setString(3, role);
+	        pstmt.setTimestamp(4, deadline);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -551,7 +559,33 @@ public class Database {
 	    return "";
 	}
 
-	
+	/*******
+	 * <p> Method: boolean isInvitationCodeExpired(String code) </p>
+	 *
+	 * <p> Description: Check if an invitation code has expired.</p>
+	 *
+	 * @param code is the 6 character String invitation code
+	 *
+	 * @return true if expired or not found, false if still valid
+	 *
+	 */
+	public boolean isInvitationCodeExpired(String code) {
+	    String query = "SELECT deadline FROM InvitationCodes WHERE code = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, code);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            Timestamp deadline = rs.getTimestamp("deadline");
+	            Timestamp now = new Timestamp(System.currentTimeMillis());
+	            return now.after(deadline); // Returns true if current time is after deadline
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return true; // If code not found, treat as expired
+	}
+
+
 	/*******
 	 * <p> Method: String getEmailAddressUsingCode (String code ) </p>
 	 * 
