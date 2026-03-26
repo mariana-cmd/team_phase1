@@ -1,6 +1,8 @@
 package entityClasses;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /*******
@@ -41,6 +43,9 @@ public class Reply {
 
     /** Timestamp recording when the reply was created. */
     private final LocalDateTime createdAt;
+
+    /** Tracks which users have read this reply (by username). */
+    private Set<String> readByUsers = new HashSet<>();
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -166,5 +171,31 @@ public class Reply {
                 + "Please shorten your reply.");
         }
         this.body = body;
+    }
+
+    /*****
+     * <p> Method: void markAsRead(String username) </p>
+     *
+     * <p> Description: Records that the given user has read this reply. </p>
+     *
+     * @param username the username to mark as having read this reply
+     */
+    public void markAsRead(String username) {
+        if (username != null) {
+            readByUsers.add(username);
+        }
+    }
+
+    /*****
+     * <p> Method: boolean isReadBy(String username) </p>
+     *
+     * <p> Description: Returns true if the given user has read this reply. </p>
+     *
+     * @param username the username to check
+     * @return true if the user has read this reply, false otherwise
+     */
+    public boolean isReadBy(String username) {
+        if (username == null) return false;
+        return readByUsers.contains(username);
     }
 }

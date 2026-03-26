@@ -1,6 +1,8 @@
 package entityClasses;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /*******
@@ -51,6 +53,9 @@ public class Post {
 
     /** Soft-delete flag. True means deleted; the post is retained in storage. */
     private boolean isDeleted;
+
+    /** Tracks which users have read this post (by username). */
+    private Set<String> readByUsers = new HashSet<>();
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -227,5 +232,31 @@ public class Post {
      */
     public void setDeleted(boolean deleted) {
         this.isDeleted = deleted;
+    }
+
+    /*****
+     * <p> Method: void markAsRead(String username) </p>
+     *
+     * <p> Description: Records that the given user has read this post. </p>
+     *
+     * @param username the username to mark as having read this post
+     */
+    public void markAsRead(String username) {
+        if (username != null) {
+            readByUsers.add(username);
+        }
+    }
+
+    /*****
+     * <p> Method: boolean isReadBy(String username) </p>
+     *
+     * <p> Description: Returns true if the given user has read this post. </p>
+     *
+     * @param username the username to check
+     * @return true if the user has read this post, false otherwise
+     */
+    public boolean isReadBy(String username) {
+        if (username == null) return false;
+        return readByUsers.contains(username);
     }
 }

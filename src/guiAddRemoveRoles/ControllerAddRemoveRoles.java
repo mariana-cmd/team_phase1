@@ -131,9 +131,9 @@ public class ControllerAddRemoveRoles {
 		if (!theDatabase.getCurrentAdminRole())
 			ViewAddRemoveRoles.addList.add("Admin");
 		if (!theDatabase.getCurrentNewRole1())
-			ViewAddRemoveRoles.addList.add("Role1");
+			ViewAddRemoveRoles.addList.add("Student");
 		if (!theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.addList.add("Role2");
+			ViewAddRemoveRoles.addList.add("Instructor");
 
 		// Create the list of roles that could be removed for the currently selected user (e.g., Do
 		// not show a role to remove that the user does not have!)
@@ -142,9 +142,9 @@ public class ControllerAddRemoveRoles {
 		if (theDatabase.getCurrentAdminRole())
 			ViewAddRemoveRoles.removeList.add("Admin");
 		if (theDatabase.getCurrentNewRole1())
-			ViewAddRemoveRoles.removeList.add("Role1");
+			ViewAddRemoveRoles.removeList.add("Student");
 		if (theDatabase.getCurrentNewRole2())
-			ViewAddRemoveRoles.removeList.add("Role2");
+			ViewAddRemoveRoles.removeList.add("Instructor");
 		
 		// Create the list or roles that the user currently has with proper use of a comma between
 		// items
@@ -160,9 +160,9 @@ public class ControllerAddRemoveRoles {
 		// Roles 1 - It could be at the head of the list or later in the list
 		if (theDatabase.getCurrentNewRole1()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role1"; 
+				theCurrentRoles += ", Student";
 			else {
-				theCurrentRoles += "Role1";
+				theCurrentRoles += "Student";
 				notTheFirst = true;
 			}
 		}
@@ -170,9 +170,9 @@ public class ControllerAddRemoveRoles {
 		// Roles 2 - It could be at the head of the list or later in the list
 		if (theDatabase.getCurrentNewRole2()) {
 			if (notTheFirst)
-				theCurrentRoles += ", Role2"; 
+				theCurrentRoles += ", Instructor";
 			else {
-				theCurrentRoles += "Role2";
+				theCurrentRoles += "Instructor";
 				notTheFirst = true;
 			}
 		}

@@ -79,6 +79,10 @@ public class FoundationsMain extends Application {
 	// system for other methods that need it can access it.
 	/** The singleton database instance shared across the entire application. */
 	public static Database database = new Database();
+	/** Shared in-memory list of all discussion posts. */
+	public static entityClasses.PostList postList = new entityClasses.PostList();
+	/** Shared in-memory list of all replies. */
+	public static entityClasses.ReplyList replyList = new entityClasses.ReplyList();
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
 
 	/** Tracks which role's home page is currently active (0 = admin, 1 = role1, 2 = role2). */

@@ -70,6 +70,54 @@ public class ControllerRole1Home {
 	 * restarted.</p>
 	 * 
 	 */	
+	/**********
+	 * <p> Method: goToAllPosts() </p>
+	 *
+	 * <p> Description: Navigates to the Student All Posts page. </p>
+	 *
+	 * Student US-1: View all discussion posts.
+	 */
+	protected static void goToAllPosts() {
+		guiStudentAllPosts.ViewStudentAllPosts.displayStudentAllPosts(
+			ViewRole1Home.theStage, ViewRole1Home.theUser);
+	}
+
+	/**********
+	 * <p> Method: goToMyPosts() </p>
+	 *
+	 * <p> Description: Navigates to the Student My Posts page. </p>
+	 *
+	 * Student US-3: View own posts with reply counts.
+	 */
+	protected static void goToMyPosts() {
+		guiStudentMyPosts.ViewStudentMyPosts.displayStudentMyPosts(
+			ViewRole1Home.theStage, ViewRole1Home.theUser);
+	}
+
+	/**********
+	 * <p> Method: goToSearch() </p>
+	 *
+	 * <p> Description: Navigates to the Student Search page. </p>
+	 *
+	 * Student US-5: Search posts by keyword.
+	 */
+	protected static void goToSearch() {
+		guiStudentSearch.ViewStudentSearch.displayStudentSearch(
+			ViewRole1Home.theStage, ViewRole1Home.theUser);
+	}
+
+	/**********
+	 * <p> Method: goToCreatePost() </p>
+	 *
+	 * <p> Description: Navigates to the Student Create Post page. </p>
+	 *
+	 * Student US-6: Create a new discussion post.
+	 */
+	protected static void goToCreatePost() {
+		guiStudentCreatePost.ViewStudentCreatePost.displayStudentCreatePost(
+			ViewRole1Home.theStage, ViewRole1Home.theUser);
+	}
+
 	protected static void performQuit() {
 		System.exit(0);
 	}

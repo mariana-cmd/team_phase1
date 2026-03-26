@@ -97,7 +97,7 @@ public class ViewAdminHome {
 	/** ComboBox for selecting the role to assign via the invitation. */
 	protected static ComboBox <String> combobox_SelectRole = new ComboBox <String>();
 	/** Array of available role names for invitation assignment. */
-	protected static String [] roles = {"Admin", "Role1", "Role2"};
+	protected static String [] roles = {"Admin", "Student", "Instructor"};
 	/** Button to send the invitation email. */
 	protected static Button button_SendInvitation = new Button("Send Invitation");
 	/** Alert displayed when the email address entered is invalid. */

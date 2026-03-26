@@ -7,4 +7,10 @@ module FoundationsSP26 {
 	requires java.sql;
 
 	opens applicationMain to javafx.graphics, javafx.fxml;
+	opens guiStudentAllPosts to javafx.graphics, javafx.fxml;
+	opens guiStudentCreatePost to javafx.graphics, javafx.fxml;
+	opens guiStudentViewPost to javafx.graphics, javafx.fxml;
+	opens guiStudentMyPosts to javafx.graphics, javafx.fxml;
+	opens guiStudentSearch to javafx.graphics, javafx.fxml;
+	opens guiStudentCreateReply to javafx.graphics, javafx.fxml;
 }

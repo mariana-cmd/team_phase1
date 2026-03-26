@@ -65,6 +65,12 @@ public class ViewRole1Home {
 	protected static Button button_Logout = new Button("Logout");
 	protected static Button button_Quit = new Button("Quit");
 
+	// GUI Area 2: Navigation buttons for student discussion features
+	protected static Button button_AllPosts    = new Button("View All Posts");
+	protected static Button button_MyPosts     = new Button("My Posts");
+	protected static Button button_SearchPosts = new Button("Search Posts");
+	protected static Button button_NewPost     = new Button("New Post");
+
 	// This is the end of the GUI objects for the page.
 	
 	// These attributes are used to configure the page and populate it with this user's information
@@ -127,7 +133,7 @@ public class ViewRole1Home {
 		label_UserDetails.setText("User: " + theUser.getUserName());
 				
 		// Set the title for the window, display the page, and wait for the Admin to do something
-		theStage.setTitle("CSE 360 Foundations: Role1 Home Page");
+		theStage.setTitle("CSE 360 Foundations: Student Home Page");
 		theStage.setScene(theViewRole1HomeScene);
 		theStage.show();
 	}
@@ -154,7 +160,7 @@ public class ViewRole1Home {
 		// Populate the window with the title and other common widgets and set their static state
 		
 		// GUI Area 1
-		label_PageTitle.setText("Role1 Home Page");
+		label_PageTitle.setText("Student Home Page");
 		setupLabelUI(label_PageTitle, "Arial", 28, width, Pos.CENTER, 0, 5);
 
 		label_UserDetails.setText("User: " + theUser.getUserName());
@@ -163,11 +169,21 @@ public class ViewRole1Home {
 		setupButtonUI(button_UpdateThisUser, "Dialog", 18, 170, Pos.CENTER, 610, 45);
 		button_UpdateThisUser.setOnAction((_) -> {ControllerRole1Home.performUpdate(); });
 		
-		// GUI Area 2
-		
-			// This is a stub, so this area is empty
-		
-		
+		// GUI Area 2 — Student navigation buttons
+		// Student US-1, US-3, US-5, US-6
+		setupButtonUI(button_AllPosts,    "Dialog", 18, 250, Pos.CENTER,  20, 130);
+		button_AllPosts.setOnAction((_) -> { ControllerRole1Home.goToAllPosts(); });
+
+		setupButtonUI(button_MyPosts,     "Dialog", 18, 250, Pos.CENTER, 290, 130);
+		button_MyPosts.setOnAction((_) -> { ControllerRole1Home.goToMyPosts(); });
+
+		setupButtonUI(button_SearchPosts, "Dialog", 18, 250, Pos.CENTER,  20, 180);
+		button_SearchPosts.setOnAction((_) -> { ControllerRole1Home.goToSearch(); });
+
+		setupButtonUI(button_NewPost,     "Dialog", 18, 250, Pos.CENTER, 290, 180);
+		button_NewPost.setOnAction((_) -> { ControllerRole1Home.goToCreatePost(); });
+
+
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
         button_Logout.setOnAction((_) -> {ControllerRole1Home.performLogout(); });
@@ -180,6 +196,7 @@ public class ViewRole1Home {
 		// Place all of the widget items into the Root Pane's list of children
          theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+			button_AllPosts, button_MyPosts, button_SearchPosts, button_NewPost,
 	        line_Separator4, button_Logout, button_Quit);
 }
 	
