@@ -208,19 +208,40 @@ public class User {
     // Gets the current value of the Student role attribute.
     public String getEmailAddress() { return emailAddress; }
 
-    /** Sets the username. @param s the new username */
+    /**
+     * Sets the username.
+     * @param s the new username
+     */
     public void setUserName(String s) { userName = s; }
-    /** Sets the password. @param s the new password */
+    /**
+     * Sets the password.
+     * @param s the new password
+     */
     public void setPassword(String s) { password = s; }
-    /** Sets the first name. @param s the new first name */
+    /**
+     * Sets the first name.
+     * @param s the new first name
+     */
     public void setFirstName(String s) { firstName = s; }
-    /** Sets the middle name. @param s the new middle name */
+    /**
+     * Sets the middle name.
+     * @param s the new middle name
+     */
     public void setMiddleName(String s) { middleName = s; }
-    /** Sets the last name. @param s the new last name */
+    /**
+     * Sets the last name.
+     * @param s the new last name
+     */
     public void setLastName(String s) { lastName = s; }
-    /** Sets the preferred first name. @param s the new preferred first name */
+    /**
+     * Sets the preferred first name.
+     * @param s the new preferred first name
+     */
     public void setPreferredFirstName(String s) { preferredFirstName = s; }
-    /** Sets the email address. @param s the new email address */
+    /**
+     * Sets the email address.
+     * @param s the new email address
+     */
     public void setEmailAddress(String s) { emailAddress = s; }
 
     
