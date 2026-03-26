@@ -60,7 +60,10 @@ import javafx.scene.control.Alert.AlertType;
  */
 
 public class FoundationsMain extends Application {
-	
+
+	/** Default constructor. JavaFX requires a public no-arg constructor to launch the application. */
+	public FoundationsMain() {}
+
 	/*-*******************************************************************************************
 
 	Attributes

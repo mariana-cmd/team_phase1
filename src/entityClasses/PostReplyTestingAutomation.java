@@ -14,12 +14,20 @@ package entityClasses;
  */
 public class PostReplyTestingAutomation {
 
+    /** Default constructor — not instantiated; all methods are static. */
+    public PostReplyTestingAutomation() {}
+
     static int numPassed = 0;   // Counter of the number of passed tests
     static int numFailed = 0;   // Counter of the number of failed tests
 
-    /*
-     * This mainline displays a header to the console, performs a sequence of
-     * test cases, and then displays a footer with a summary of the results
+    /*****
+     * <p> Method: main(String[] args) </p>
+     *
+     * <p> Description: Entry point for the automated test suite. Displays a header,
+     * runs all test cases for Post, Reply, PostList, and ReplyList, then prints a
+     * summary of passed and failed tests. </p>
+     *
+     * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
 

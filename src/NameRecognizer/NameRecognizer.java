@@ -46,6 +46,12 @@ public class NameRecognizer {
 			currentChar = ' ';
 	}
 	
+	/**
+	 * Validates whether the given input string is a properly formatted name.
+	 *
+	 * @param input the name string to validate
+	 * @return true if the name is valid, false otherwise
+	 */
 	public static boolean checkName(String input) {
 		//input is empty
 		if (input.length() <= 0) {

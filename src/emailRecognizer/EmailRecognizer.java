@@ -34,6 +34,7 @@ public class EmailRecognizer {
 
 	/** The error message text produced by the recognizer. */
 	public static String emailAddressErrorMessage = "";	// The error message text
+	/** The email address input string currently being processed by the recognizer. */
 	public static String emailAddressInput = "";		// The input being processed
 	/** The index within the input where an error was located (-1 if none). */
 	public static int emailAddressIndexofError = -1;	// The index where the error was located

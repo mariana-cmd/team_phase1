@@ -1,3 +1,23 @@
 /.metadata/
 /bin/
 .DS_Store
+
+# Generated Javadoc output
+/FoundationsSP26/
+/index-files/
+/legal/
+/resource-files/
+/script-files/
+allclasses-index.html
+allpackages-index.html
+constant-values.html
+element-list
+help-doc.html
+index.html
+member-search-index.js
+module-search-index.js
+overview-tree.html
+package-search-index.js
+search.html
+tag-search-index.js
+type-search-index.js
