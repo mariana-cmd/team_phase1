@@ -1,0 +1,231 @@
+package entityClasses;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/*******
+ * <p> Title: Post Class </p>
+ *
+ * <p> Description: Represents a discussion post made by a student. Each post has a unique
+ *  auto-generated ID, an author, a title, a body, an optional thread name (defaults to
+ *  "General"), a creation timestamp, and a soft delete flag. </p>
+ *
+ * <p> Character limits: title max 200 chars, body max 10,000 chars. </p>
+ */
+public class Post {
+
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /** Maximum number of characters allowed in a post title. */
+    public static final int MAX_TITLE_LENGTH = 200;
+
+    /** Maximum number of characters allowed in a post body (~2,000 words). */
+    public static final int MAX_BODY_LENGTH = 10_000;
+
+    /** Default thread name used when none is supplied. */
+    public static final String DEFAULT_THREAD = "General";
+
+    // -------------------------------------------------------------------------
+    // Fields
+    // -------------------------------------------------------------------------
+
+    /** Globally unique identifier for this post (UUID string). */
+    private final String postId;
+
+    /** Username of the student who created the post. Cannot be null. */
+    private String authorUsername;
+
+    /** Short descriptive title. 1–200 characters, cannot be blank. */
+    private String title;
+
+    /** Full content of the post. 1–10,000 characters, cannot be blank. */
+    private String body;
+
+    /** Discussion thread this post belongs to. Defaults to "General". */
+    private String threadName;
+
+    /** Timestamp recording when the post was first created. */
+    private final LocalDateTime createdAt;
+
+    /** Soft-delete flag. True means deleted; the post is retained in storage. */
+    private boolean isDeleted;
+
+    // -------------------------------------------------------------------------
+    // Constructor
+    // -------------------------------------------------------------------------
+
+    /*****
+     * <p> Method: Post(String authorUsername, String title, String body, String threadName) </p>
+     *
+     * <p> Description: Creates a new Post. The post ID and creation timestamp are assigned
+     *  automatically. All supplied fields are passed through their validated setters. </p>
+     *
+     * @param authorUsername the username of the post author; must not be null
+     * @param title          the post title; 1–200 non-blank characters required
+     * @param body           the post body; 1–10,000 non-blank characters required
+     * @param threadName     the thread name; null or blank defaults to "General"
+     *
+     * @throws IllegalArgumentException if any validation rule is violated
+     */
+    public Post(String authorUsername, String title, String body, String threadName) {
+        this.postId    = UUID.randomUUID().toString();
+        this.createdAt = LocalDateTime.now();
+        this.isDeleted = false;
+
+        // Delegate to validated setters so rules are enforced in one place
+        setAuthorUsername(authorUsername);
+        setTitle(title);
+        setBody(body);
+        setThreadName(threadName);
+    }
+
+    // -------------------------------------------------------------------------
+    // Getters
+    // -------------------------------------------------------------------------
+
+    /*****
+     * <p> Method: String getPostId() </p>
+     * @return the unique post ID (UUID string)
+     */
+    public String getPostId() { return postId; }
+
+    /*****
+     * <p> Method: String getAuthorUsername() </p>
+     * @return the username of the post author
+     */
+    public String getAuthorUsername() { return authorUsername; }
+
+    /*****
+     * <p> Method: String getTitle() </p>
+     * @return the post title
+     */
+    public String getTitle() { return title; }
+
+    /*****
+     * <p> Method: String getBody() </p>
+     * @return the post body content
+     */
+    public String getBody() { return body; }
+
+    /*****
+     * <p> Method: String getThreadName() </p>
+     * @return the thread this post belongs to
+     */
+    public String getThreadName() { return threadName; }
+
+    /*****
+     * <p> Method: LocalDateTime getCreatedAt() </p>
+     * @return the timestamp when this post was created
+     */
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    /*****
+     * <p> Method: boolean isDeleted() </p>
+     * @return true if the post has been soft-deleted, false otherwise
+     */
+    public boolean isDeleted() { return isDeleted; }
+
+    // -------------------------------------------------------------------------
+    // Setters with validation
+    // -------------------------------------------------------------------------
+
+    /*****
+     * <p> Method: void setAuthorUsername(String authorUsername) </p>
+     *
+     * <p> Description: Sets the author username. Must not be null. </p>
+     *
+     * @param authorUsername the author's username
+     * @throws IllegalArgumentException if authorUsername is null
+     */
+    public void setAuthorUsername(String authorUsername) {
+        if (authorUsername == null) {
+            throw new IllegalArgumentException(
+                "Author username cannot be null. Every post must have an identifiable author.");
+        }
+        this.authorUsername = authorUsername;
+    }
+
+    /*****
+     * <p> Method: void setTitle(String title) </p>
+     *
+     * <p> Description: Sets the post title. Must not be null, must not be blank,
+     *  and must not exceed MAX_TITLE_LENGTH characters. </p>
+     *
+     * @param title the post title
+     * @throws IllegalArgumentException if title is null, blank, or too long
+     */
+    public void setTitle(String title) {
+        if (title == null) {
+            throw new IllegalArgumentException(
+                "Post title cannot be null. Please provide a descriptive title for your post.");
+        }
+        if (title.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Post title cannot be empty or consist only of whitespace. "
+                + "Please provide a meaningful title.");
+        }
+        if (title.length() > MAX_TITLE_LENGTH) {
+            throw new IllegalArgumentException(
+                "Post title is too long: " + title.length() + " characters provided, "
+                + "but the maximum allowed is " + MAX_TITLE_LENGTH + " characters. "
+                + "Please shorten your title.");
+        }
+        this.title = title;
+    }
+
+    /*****
+     * <p> Method: void setBody(String body) </p>
+     *
+     * <p> Description: Sets the post body. Must not be null, must not be blank,
+     *  and must not exceed MAX_BODY_LENGTH characters. </p>
+     *
+     * @param body the post body content
+     * @throws IllegalArgumentException if body is null, blank, or too long
+     */
+    public void setBody(String body) {
+        if (body == null) {
+            throw new IllegalArgumentException(
+                "Post body cannot be null. A post must contain actual content.");
+        }
+        if (body.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Post body cannot be empty or consist only of whitespace. "
+                + "Please write something in your post.");
+        }
+        if (body.length() > MAX_BODY_LENGTH) {
+            throw new IllegalArgumentException(
+                "Post body is too long: " + body.length() + " characters provided, "
+                + "but the maximum allowed is " + MAX_BODY_LENGTH + " characters. "
+                + "Please shorten your post content.");
+        }
+        this.body = body;
+    }
+
+    /*****
+     * <p> Method: void setThreadName(String threadName) </p>
+     *
+     * <p> Description: Sets the thread name. If null or blank, defaults to "General". </p>
+     *
+     * @param threadName the thread name; may be null or blank
+     */
+    public void setThreadName(String threadName) {
+        if (threadName == null || threadName.trim().isEmpty()) {
+            this.threadName = DEFAULT_THREAD;
+        } else {
+            this.threadName = threadName;
+        }
+    }
+
+    /*****
+     * <p> Method: void setDeleted(boolean deleted) </p>
+     *
+     * <p> Description: Sets the soft-delete flag for this post. </p>
+     *
+     * @param deleted true to mark the post as deleted, false to restore it
+     */
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+}
