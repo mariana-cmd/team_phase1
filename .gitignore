@@ -3,6 +3,8 @@
 .DS_Store
 
 # Generated Javadoc output
+/doc/
+/javadoc/
 /FoundationsSP26/
 /index-files/
 /legal/
