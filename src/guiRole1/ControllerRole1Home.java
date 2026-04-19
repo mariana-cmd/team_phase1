@@ -78,7 +78,12 @@ public class ControllerRole1Home {
 	 * Student US-1: View all discussion posts.
 	 */
 	protected static void goToAllPosts() {
+<<<<<<< HEAD
 		guiStudentAllPosts.ViewStudentAllPosts.displayStudentAllPosts(
+=======
+		// Role1 is staff in this project: navigate to the staff All Posts page
+		guiStaffAllPosts.ViewStaffAllPosts.displayStaffAllPosts(
+>>>>>>> 0c228c3 (dfjsd)
 			ViewRole1Home.theStage, ViewRole1Home.theUser);
 	}
 
@@ -90,7 +95,12 @@ public class ControllerRole1Home {
 	 * Student US-3: View own posts with reply counts.
 	 */
 	protected static void goToMyPosts() {
+<<<<<<< HEAD
 		guiStudentMyPosts.ViewStudentMyPosts.displayStudentMyPosts(
+=======
+		// Navigate to the staff My Posts page
+		guiStaffMyPosts.ViewStaffMyPosts.displayStaffMyPosts(
+>>>>>>> 0c228c3 (dfjsd)
 			ViewRole1Home.theStage, ViewRole1Home.theUser);
 	}
 
@@ -102,6 +112,10 @@ public class ControllerRole1Home {
 	 * Student US-5: Search posts by keyword.
 	 */
 	protected static void goToSearch() {
+<<<<<<< HEAD
+=======
+		// reuse the existing search page (works for staff as well)
+>>>>>>> 0c228c3 (dfjsd)
 		guiStudentSearch.ViewStudentSearch.displayStudentSearch(
 			ViewRole1Home.theStage, ViewRole1Home.theUser);
 	}
@@ -114,7 +128,12 @@ public class ControllerRole1Home {
 	 * Student US-6: Create a new discussion post.
 	 */
 	protected static void goToCreatePost() {
+<<<<<<< HEAD
 		guiStudentCreatePost.ViewStudentCreatePost.displayStudentCreatePost(
+=======
+		// Navigate to the staff Create Post page
+		guiStaffCreatePost.ViewStaffCreatePost.displayStaffCreatePost(
+>>>>>>> 0c228c3 (dfjsd)
 			ViewRole1Home.theStage, ViewRole1Home.theUser);
 	}
 

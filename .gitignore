@@ -3,8 +3,11 @@
 .DS_Store
 
 # Generated Javadoc output
+<<<<<<< HEAD
 /doc/
 /javadoc/
+=======
+>>>>>>> 0c228c3 (dfjsd)
 /FoundationsSP26/
 /index-files/
 /legal/

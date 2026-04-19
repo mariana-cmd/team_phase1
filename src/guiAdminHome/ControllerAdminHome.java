@@ -46,6 +46,36 @@ public class ControllerAdminHome {
 	// Reference for the in-memory database so this package has access
 	private static Database theDatabase = applicationMain.FoundationsMain.database;
 
+<<<<<<< HEAD
+=======
+	// When running unit tests set this to true to avoid blocking JavaFX dialogs
+	static boolean testMode = false;
+
+	// Test-only fields to capture alerts without touching JavaFX
+	static String testLastAlertContent = null;
+	static String testLastAlertTitle = null;
+	static String testLastAlertHeader = null;
+    // Test-only fields to capture text/label updates
+    static String testText_InvitationEmailAddress = null;
+    static String testLabel_NumberOfInvitations = null;
+    static String testLabel_NumberOfUsers = null;
+
+	private static void setAlertTitle(javafx.scene.control.Alert a, String title) {
+		if (testMode) testLastAlertTitle = title;
+		else a.setTitle(title);
+	}
+
+	private static void setAlertHeader(javafx.scene.control.Alert a, String header) {
+		if (testMode) testLastAlertHeader = header;
+		else a.setHeaderText(header);
+	}
+
+	private static void setAlertContent(javafx.scene.control.Alert a, String content) {
+		if (testMode) testLastAlertContent = content;
+		else a.setContentText(content);
+	}
+
+>>>>>>> 0c228c3 (dfjsd)
 	/**********
 	 * <p> 
 	 * 
@@ -64,9 +94,15 @@ public class ControllerAdminHome {
 		// Check to ensure that we are not sending a second message with a new invitation code to
 		// the same email address.  
 		if (theDatabase.emailaddressHasBeenUsed(emailAddress)) {
+<<<<<<< HEAD
 			ViewAdminHome.alertEmailError.setContentText(
 					"An invitation has already been sent to this email address.");
 			ViewAdminHome.alertEmailError.showAndWait();
+=======
+			setAlertContent(ViewAdminHome.alertEmailError,
+					"An invitation has already been sent to this email address.");
+			if (!testMode) ViewAdminHome.alertEmailError.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			return;
 		}
 		
@@ -77,6 +113,7 @@ public class ControllerAdminHome {
 		String msg = "Code: " + invitationCode + " for role " + theSelectedRole + 
 				" was sent to: " + emailAddress;
 		System.out.println(msg);
+<<<<<<< HEAD
 		ViewAdminHome.alertEmailSent.setContentText(msg);
 		ViewAdminHome.alertEmailSent.showAndWait();
 		
@@ -84,6 +121,20 @@ public class ControllerAdminHome {
 		ViewAdminHome.text_InvitationEmailAddress.setText("");
 		ViewAdminHome.label_NumberOfInvitations.setText("Number of outstanding invitations: " + 
 				theDatabase.getNumberOfInvitations());
+=======
+		setAlertContent(ViewAdminHome.alertEmailSent, msg);
+		if (!testMode) ViewAdminHome.alertEmailSent.showAndWait();
+		
+		// Update the Admin Home pages status
+		if (testMode) {
+			testText_InvitationEmailAddress = "";
+			testLabel_NumberOfInvitations = "Number of outstanding invitations: " + theDatabase.getNumberOfInvitations();
+		} else {
+			ViewAdminHome.text_InvitationEmailAddress.setText("");
+			ViewAdminHome.label_NumberOfInvitations.setText("Number of outstanding invitations: " + 
+					theDatabase.getNumberOfInvitations());
+		}
+>>>>>>> 0c228c3 (dfjsd)
 	}
 	
 	/**********
@@ -96,10 +147,17 @@ public class ControllerAdminHome {
 	 */
 	protected static void manageInvitations () {
 		System.out.println("\n*** WARNING ***: Manage Invitations Not Yet Implemented");
+<<<<<<< HEAD
 		ViewAdminHome.alertNotImplemented.setTitle("*** WARNING ***");
 		ViewAdminHome.alertNotImplemented.setHeaderText("Manage Invitations Issue");
 		ViewAdminHome.alertNotImplemented.setContentText("Manage Invitations Not Yet Implemented");
 		ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+		setAlertTitle(ViewAdminHome.alertNotImplemented, "*** WARNING ***");
+		setAlertHeader(ViewAdminHome.alertNotImplemented, "Manage Invitations Issue");
+		setAlertContent(ViewAdminHome.alertNotImplemented, "Manage Invitations Not Yet Implemented");
+		if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 	}
 	
 	/**********
@@ -120,10 +178,17 @@ public class ControllerAdminHome {
 		}
 
 		if (userList.isEmpty()) {
+<<<<<<< HEAD
 			ViewAdminHome.alertNotImplemented.setTitle("No Users");
 			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Set Password");
 			ViewAdminHome.alertNotImplemented.setContentText("No users available.");
 			ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+			setAlertTitle(ViewAdminHome.alertNotImplemented, "No Users");
+			setAlertHeader(ViewAdminHome.alertNotImplemented, "Cannot Set Password");
+			setAlertContent(ViewAdminHome.alertNotImplemented, "No users available.");
+			if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			return;
 		}
 
@@ -141,6 +206,7 @@ public class ControllerAdminHome {
 			// Generate one-time password
 			String oneTimePass = theDatabase.generateOneTimePassword(selectedUser);
 
+<<<<<<< HEAD
 			if (oneTimePass != null) {
 				ViewAdminHome.alertNotImplemented.setTitle("Success");
 				ViewAdminHome.alertNotImplemented.setHeaderText("One-Time Password Set");
@@ -155,6 +221,21 @@ public class ControllerAdminHome {
 					"Could not set one-time password.");
 			}
 			ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+				if (oneTimePass != null) {
+					setAlertTitle(ViewAdminHome.alertNotImplemented, "Success");
+					setAlertHeader(ViewAdminHome.alertNotImplemented, "One-Time Password Set");
+					setAlertContent(ViewAdminHome.alertNotImplemented,
+						"One-time password for " + selectedUser + ": " + oneTimePass +
+						"\n\nThe user will be required to change this password upon next login.");
+					System.out.println("One-time password set for " + selectedUser + ": " + oneTimePass);
+				} else {
+					setAlertTitle(ViewAdminHome.alertNotImplemented, "Error");
+					setAlertHeader(ViewAdminHome.alertNotImplemented, "Failed");
+					setAlertContent(ViewAdminHome.alertNotImplemented, "Could not set one-time password.");
+				}
+				if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 		}
 	}
 	
@@ -176,10 +257,17 @@ public class ControllerAdminHome {
 		}
 
 		if (userList.isEmpty()) {
+<<<<<<< HEAD
 			ViewAdminHome.alertNotImplemented.setTitle("No Users");
 			ViewAdminHome.alertNotImplemented.setHeaderText("Cannot Delete");
 			ViewAdminHome.alertNotImplemented.setContentText("No users available to delete.");
 			ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+			setAlertTitle(ViewAdminHome.alertNotImplemented, "No Users");
+			setAlertHeader(ViewAdminHome.alertNotImplemented, "Cannot Delete");
+			setAlertContent(ViewAdminHome.alertNotImplemented, "No users available to delete.");
+			if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			return;
 		}
 
@@ -201,13 +289,19 @@ public class ControllerAdminHome {
 			confirmAlert.setHeaderText("Delete User: " + selectedUser);
 			confirmAlert.setContentText("Are you sure you want to delete this user?");
 
+<<<<<<< HEAD
 			java.util.Optional<javafx.scene.control.ButtonType> confirmResult = confirmAlert.showAndWait();
+=======
+			java.util.Optional<javafx.scene.control.ButtonType> confirmResult = java.util.Optional.empty();
+			if (!testMode) confirmResult = confirmAlert.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			if (confirmResult.isPresent() &&
 				confirmResult.get() == javafx.scene.control.ButtonType.OK) {
 
 				boolean success = theDatabase.deleteUser(selectedUser);
 
 				if (success) {
+<<<<<<< HEAD
 					ViewAdminHome.alertNotImplemented.setTitle("Success");
 					ViewAdminHome.alertNotImplemented.setHeaderText("User Deleted");
 					ViewAdminHome.alertNotImplemented.setContentText(
@@ -221,6 +315,24 @@ public class ControllerAdminHome {
 						"Could not delete user. You cannot delete your own account or the last admin.");
 				}
 				ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+					setAlertTitle(ViewAdminHome.alertNotImplemented, "Success");
+					setAlertHeader(ViewAdminHome.alertNotImplemented, "User Deleted");
+					setAlertContent(ViewAdminHome.alertNotImplemented, "User " + selectedUser + " has been deleted.");
+					if (testMode) {
+						testLabel_NumberOfUsers = "Number of users: " + theDatabase.getNumberOfUsers();
+					} else {
+						ViewAdminHome.label_NumberOfUsers.setText(
+							"Number of users: " + theDatabase.getNumberOfUsers());
+					}
+				} else {
+					setAlertTitle(ViewAdminHome.alertNotImplemented, "Error");
+					setAlertHeader(ViewAdminHome.alertNotImplemented, "Delete Failed");
+					setAlertContent(ViewAdminHome.alertNotImplemented,
+						"Could not delete user. You cannot delete your own account or the last admin.");
+				}
+				if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			}
 		}
 	}
@@ -256,10 +368,17 @@ public class ControllerAdminHome {
 			userList.append("----------------------------------------\n");
 		}
 
+<<<<<<< HEAD
 		ViewAdminHome.alertNotImplemented.setTitle("User List");
 		ViewAdminHome.alertNotImplemented.setHeaderText("All Users in System");
 		ViewAdminHome.alertNotImplemented.setContentText(userList.toString());
 		ViewAdminHome.alertNotImplemented.showAndWait();
+=======
+		setAlertTitle(ViewAdminHome.alertNotImplemented, "User List");
+		setAlertHeader(ViewAdminHome.alertNotImplemented, "All Users in System");
+		setAlertContent(ViewAdminHome.alertNotImplemented, userList.toString());
+		if (!testMode) ViewAdminHome.alertNotImplemented.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 	}
 	
 	/**********
@@ -292,9 +411,14 @@ public class ControllerAdminHome {
 		String validationError = emailRecognizer.EmailRecognizer.checkEmailAddress(emailAddress);
 
 		if (!validationError.isEmpty()) {
+<<<<<<< HEAD
 			ViewAdminHome.alertEmailError.setContentText(
 					"Invalid email address:\n" + validationError);
 			ViewAdminHome.alertEmailError.showAndWait();
+=======
+			setAlertContent(ViewAdminHome.alertEmailError, "Invalid email address:\n" + validationError);
+			if (!testMode) ViewAdminHome.alertEmailError.showAndWait();
+>>>>>>> 0c228c3 (dfjsd)
 			return true;
 		}
 		return false;

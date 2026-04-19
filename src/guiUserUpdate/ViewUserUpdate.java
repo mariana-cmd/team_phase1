@@ -121,7 +121,68 @@ public class ViewUserUpdate {
 	/** The shared Scene that each invocation of displayUserUpdate populates and displays. */
 	public static Scene theUserUpdateScene = null;	// The Scene each invocation populates
 
+<<<<<<< HEAD
 	private static Optional<String> result;		// The result from a pop-up dialog
+=======
+  private static Optional<String> result;		// The result from a pop-up dialog
+
+  // test mode fields to make UI dialog behaviour testable without blocking
+  static boolean testMode = false;
+  static String testLastAlertContent = null;
+  static String testLastAlertTitle = null;
+  static String testLastAlertHeader = null;
+
+  private static void setAlertContent(Alert a, String content) {
+    if (testMode) testLastAlertContent = content;
+    else a.setContentText(content);
+  }
+
+  private static void setAlertTitle(Alert a, String title) {
+    if (testMode) testLastAlertTitle = title;
+    else a.setTitle(title);
+  }
+
+  private static void setAlertHeader(Alert a, String header) {
+    if (testMode) testLastAlertHeader = header;
+    else a.setHeaderText(header);
+  }
+
+  /**
+   * update the user's email address from the given input string. if the input does not
+   * contain an '@' or '.com' an error alert is displayed with the message
+   * "a valid email should have an @ and .com" and the displayed email label is set to
+   * "<none>". this method is package-private to allow unit tests to call it directly.
+   *
+   * @param input the new email address entered by the user
+   */
+  static void updateEmailAddressFromInput(String input) {
+    if (input == null) input = "";
+
+    // quick syntactic check required by this feature
+    if (!input.contains("@") || !input.contains(".com")) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      setAlertTitle(alert, "Invalid Email");
+      setAlertHeader(alert, null);
+      setAlertContent(alert, "a valid email should have an @ and .com");
+      if (!testMode) alert.showAndWait();
+      label_CurrentEmailAddress.setText("<none>");
+      return;
+    }
+
+    // otherwise perform the existing update flow
+    theDatabase.updateEmailAddress(theUser.getUserName(), input);
+    theDatabase.getUserAccountDetails(theUser.getUserName());
+    String newEmail = theDatabase.getCurrentEmailAddress();
+    // there is no error message, so email was valid, so update it
+    if (EmailRecognizer.checkEmailAddress(newEmail) == "") {
+      theUser.setEmailAddress(newEmail);
+      label_CurrentEmailAddress.setText(newEmail);
+    } else {
+      // a string was returned, so email was invalid. empty label
+      label_CurrentEmailAddress.setText("<none>");
+    }
+  }
+>>>>>>> 0c228c3 (dfjsd)
 
 	/*-********************************************************************************************
 
@@ -389,6 +450,7 @@ public class ViewUserUpdate {
         setupLabelUI(label_EmailAddress, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 400);
         setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
         setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
+<<<<<<< HEAD
         button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddresss.showAndWait();
     		result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
     		theDatabase.getUserAccountDetails(theUser.getUserName());
@@ -407,6 +469,12 @@ public class ViewUserUpdate {
         	label_CurrentEmailAddress.setText("<none>");
     		}
  			});
+=======
+        button_UpdateEmailAddress.setOnAction((_) -> {
+            result = dialogUpdateEmailAddresss.showAndWait();
+            result.ifPresent(_ -> updateEmailAddressFromInput(result.get()));
+        });
+>>>>>>> 0c228c3 (dfjsd)
         
         // Set up the button to proceed to this user's home page
         setupButtonUI(button_ProceedToUserHomePage, "Dialog", 18, 300, 
