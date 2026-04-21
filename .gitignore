@@ -1,0 +1,13 @@
+# Compiled output
+bin/
+*.class
+*.jar
+
+# macOS
+.DS_Store
+bin/.DS_Store
+
+# H2 database files
+*.db
+*.mv.db
+*.trace.db
