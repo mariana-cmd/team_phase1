@@ -67,6 +67,9 @@ public class ViewRole2Home {
 	protected static Button button_Logout = new Button("Logout");
 	protected static Button button_Quit = new Button("Quit");
 
+	// Staff Request navigation button
+	protected static Button button_StaffRequests = new Button("Staff Requests");
+
 	// GUI Area 2: Navigation buttons for discussion features
 	protected static Button button_AllPosts    = new Button("View All Posts");
 	protected static Button button_MyPosts     = new Button("My Posts");
@@ -188,10 +191,9 @@ public class ViewRole2Home {
 		
 		setupButtonUI(button_GradePosts,     "Dialog", 18, 250, Pos.CENTER, 20, 230);
 		button_GradePosts.setOnAction((_) -> { ControllerRole2Home.goToGrading(); });
-		
-		
-		
 
+		setupButtonUI(button_StaffRequests, "Dialog", 18, 250, Pos.CENTER, 290, 230);
+		button_StaffRequests.setOnAction((_) -> { ControllerRole2Home.goToStaffRequests(); });
 
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
@@ -206,6 +208,7 @@ public class ViewRole2Home {
         theRootPane.getChildren().addAll(
         	    label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
         	    button_AllPosts, button_MyPosts, button_GradePosts, button_SearchPosts, button_NewPost,
+        	    button_StaffRequests,
         	    line_Separator4, button_Logout, button_Quit
         	);
 }

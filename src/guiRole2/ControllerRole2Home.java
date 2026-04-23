@@ -133,13 +133,23 @@ public class ControllerRole2Home {
 	}
 
 	/**********
+	 * <p> Method: goToStaffRequests() </p>
+	 * <p> Description: Navigates to the Staff Request List page. </p>
+	 */
+	protected static void goToStaffRequests() {
+		guiStaffRequestList.ViewStaffRequestList.showingOpen = true;
+		guiStaffRequestList.ViewStaffRequestList.displayStaffRequestList(
+				ViewRole2Home.theStage, ViewRole2Home.theUser);
+	}
+
+	/**********
 	 * <p> Method: performQuit() </p>
-	 * 
+	 *
 	 * <p> Description: This method terminates the execution of the program.  It leaves the
 	 * database in a state where the normal login page will be displayed when the application is
 	 * restarted.</p>
-	 * 
-	 */	
+	 *
+	 */
 	protected static void performQuit() {
 		System.exit(0);
 	}

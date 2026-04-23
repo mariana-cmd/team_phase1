@@ -86,6 +86,8 @@ public class FoundationsMain extends Application {
 	public static entityClasses.PostList postList = new entityClasses.PostList();
 	/** Shared in-memory list of all replies. */
 	public static entityClasses.ReplyList replyList = new entityClasses.ReplyList();
+	/** Shared in-memory list of all staff requests. */
+	public static entityClasses.StaffRequestList staffRequestList = new entityClasses.StaffRequestList();
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
 
 	/** Tracks which role's home page is currently active (0 = admin, 1 = role1, 2 = role2). */
@@ -98,6 +100,10 @@ public class FoundationsMain extends Application {
 		try {
 			// Connect to the database
 			database.connectToDatabase();
+			// Load persisted staff requests into the in-memory list
+			for (entityClasses.StaffRequest sr : database.loadAllStaffRequests()) {
+				staffRequestList.addRequest(sr);
+			}
 		} catch (SQLException e) {
 			// If the connection request fails, it usually means some other app is using it
 			databaseInUse.setTitle("*** ERROR ***");

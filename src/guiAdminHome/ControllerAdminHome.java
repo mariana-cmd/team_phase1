@@ -419,8 +419,18 @@ public class ControllerAdminHome {
 	}
 	
 	/**********
-	 * <p> 
-	 * 
+	 * <p> Title: goToStaffRequests () Method. </p>
+	 * <p> Description: Navigates the admin to the Staff Request List page. </p>
+	 */
+	protected static void goToStaffRequests() {
+		guiStaffRequestList.ViewStaffRequestList.showingOpen = true;
+		guiStaffRequestList.ViewStaffRequestList.displayStaffRequestList(
+				ViewAdminHome.theStage, ViewAdminHome.theUser);
+	}
+
+	/**********
+	 * <p>
+	 *
 	 * Title: performLogout () Method. </p>
 	 * 
 	 * <p> Description: Protected method that logs this user out of the system and returns to the
