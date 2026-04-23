@@ -29,6 +29,12 @@ public class Post {
     /** Default thread name used when none is supplied. */
     public static final String DEFAULT_THREAD = "General";
 
+    /** Minimum allowed grade. */
+    public static final double MIN_GRADE = 0.0;
+
+    /** Maximum allowed grade. */
+    public static final double MAX_GRADE = 100.0;
+
     // -------------------------------------------------------------------------
     // Fields
     // -------------------------------------------------------------------------
@@ -57,6 +63,18 @@ public class Post {
     /** Tracks which users have read this post (by username). */
     private Set<String> readByUsers = new HashSet<>();
 
+    /** Numeric mark assigned by staff. Null means not yet graded. */
+    private Double grade;
+
+    /** Private feedback written by staff for the post author. */
+    private String staffFeedback;
+
+    /** Username of the staff member who assigned the grade/feedback. */
+    private String gradedBy;
+
+    /** Timestamp recording when this post was graded. Null means not yet graded. */
+    private LocalDateTime gradedAt;
+
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -78,6 +96,10 @@ public class Post {
         this.postId    = UUID.randomUUID().toString();
         this.createdAt = LocalDateTime.now();
         this.isDeleted = false;
+        this.grade = null;
+        this.staffFeedback = null;
+        this.gradedBy = null;
+        this.gradedAt = null;
 
         // Delegate to validated setters so rules are enforced in one place
         setAuthorUsername(authorUsername);
@@ -131,6 +153,36 @@ public class Post {
      * @return true if the post has been soft-deleted, false otherwise
      */
     public boolean isDeleted() { return isDeleted; }
+
+    /*****
+     * <p> Method: Double getGrade() </p>
+     * @return the numeric grade for this post, or null if not yet graded
+     */
+    public Double getGrade() { return grade; }
+
+    /*****
+     * <p> Method: String getStaffFeedback() </p>
+     * @return the private staff feedback for this post, or null if none exists
+     */
+    public String getStaffFeedback() { return staffFeedback; }
+
+    /*****
+     * <p> Method: String getGradedBy() </p>
+     * @return the username of the staff member who graded this post, or null if not yet graded
+     */
+    public String getGradedBy() { return gradedBy; }
+
+    /*****
+     * <p> Method: LocalDateTime getGradedAt() </p>
+     * @return the timestamp when the post was graded, or null if not yet graded
+     */
+    public LocalDateTime getGradedAt() { return gradedAt; }
+
+    /*****
+     * <p> Method: boolean isGraded() </p>
+     * @return true if the post has been graded, false otherwise
+     */
+    public boolean isGraded() { return grade != null; }
 
     // -------------------------------------------------------------------------
     // Setters with validation
@@ -232,6 +284,87 @@ public class Post {
      */
     public void setDeleted(boolean deleted) {
         this.isDeleted = deleted;
+    }
+
+    /*****
+     * <p> Method: void setGrade(Double grade) </p>
+     *
+     * <p> Description: Sets the numeric grade for this post. A null value clears the grade.
+     *  Non-null grades must be between MIN_GRADE and MAX_GRADE inclusive. </p>
+     *
+     * @param grade the numeric grade, or null to clear it
+     * @throws IllegalArgumentException if the grade is outside the valid range
+     */
+    public void setGrade(Double grade) {
+        if (grade == null) {
+            this.grade = null;
+            return;
+        }
+        if (grade < MIN_GRADE || grade > MAX_GRADE) {
+            throw new IllegalArgumentException(
+                "Grade must be between " + MIN_GRADE + " and " + MAX_GRADE + ".");
+        }
+        this.grade = grade;
+    }
+
+    /*****
+     * <p> Method: void setStaffFeedback(String staffFeedback) </p>
+     *
+     * <p> Description: Sets the private feedback written by staff for this post.
+     *  A null or blank value clears the feedback. </p>
+     *
+     * @param staffFeedback the feedback text to store
+     */
+    public void setStaffFeedback(String staffFeedback) {
+        if (staffFeedback == null || staffFeedback.trim().isEmpty()) {
+            this.staffFeedback = null;
+        } else {
+            this.staffFeedback = staffFeedback.trim();
+        }
+    }
+
+    /*****
+     * <p> Method: void setGradedBy(String gradedBy) </p>
+     *
+     * <p> Description: Sets the username of the staff member who graded this post.
+     *  A null or blank value clears the grader. </p>
+     *
+     * @param gradedBy the staff username
+     */
+    public void setGradedBy(String gradedBy) {
+        if (gradedBy == null || gradedBy.trim().isEmpty()) {
+            this.gradedBy = null;
+        } else {
+            this.gradedBy = gradedBy.trim();
+        }
+    }
+
+    /*****
+     * <p> Method: void setGradedAt(LocalDateTime gradedAt) </p>
+     *
+     * <p> Description: Sets the grading timestamp for this post. </p>
+     *
+     * @param gradedAt the grading time, or null if no grading timestamp should exist
+     */
+    public void setGradedAt(LocalDateTime gradedAt) {
+        this.gradedAt = gradedAt;
+    }
+
+    /*****
+     * <p> Method: void assignGrade(Double grade, String feedback, String graderUsername) </p>
+     *
+     * <p> Description: Assigns or updates the grade and private staff feedback for this post
+     *  and records who performed the grading and when it occurred. </p>
+     *
+     * @param grade the numeric grade to assign
+     * @param feedback the private feedback to assign
+     * @param graderUsername the username of the staff member assigning the grade
+     */
+    public void assignGrade(Double grade, String feedback, String graderUsername) {
+        setGrade(grade);
+        setStaffFeedback(feedback);
+        setGradedBy(graderUsername);
+        setGradedAt(LocalDateTime.now());
     }
 
     /*****

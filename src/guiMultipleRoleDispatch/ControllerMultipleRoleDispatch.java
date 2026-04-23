@@ -72,7 +72,6 @@ public class ControllerMultipleRoleDispatch {
 			
 		// See if Role2
 		} else if (role.compareTo("Role2") == 0) {
-			
 			// It is Role 2 Role
 			guiRole2.ViewRole2Home.displayRole2Home(
 					guiMultipleRoleDispatch.ViewMultipleRoleDispatch.theStage, 

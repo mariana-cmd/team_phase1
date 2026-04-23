@@ -121,9 +121,7 @@ public class ViewUserUpdate {
 	/** The shared Scene that each invocation of displayUserUpdate populates and displays. */
 	public static Scene theUserUpdateScene = null;	// The Scene each invocation populates
 
-<<<<<<< HEAD
-	private static Optional<String> result;		// The result from a pop-up dialog
-=======
+
   private static Optional<String> result;		// The result from a pop-up dialog
 
   // test mode fields to make UI dialog behaviour testable without blocking
@@ -182,7 +180,6 @@ public class ViewUserUpdate {
       label_CurrentEmailAddress.setText("<none>");
     }
   }
->>>>>>> 0c228c3 (dfjsd)
 
 	/*-********************************************************************************************
 
@@ -450,7 +447,7 @@ public class ViewUserUpdate {
         setupLabelUI(label_EmailAddress, "Arial", 18, 190, Pos.BASELINE_RIGHT, 5, 400);
         setupLabelUI(label_CurrentEmailAddress, "Arial", 18, 260, Pos.BASELINE_LEFT, 200, 400);
         setupButtonUI(button_UpdateEmailAddress, "Dialog", 18, 275, Pos.CENTER, 500, 393);
-<<<<<<< HEAD
+
         button_UpdateEmailAddress.setOnAction((_) -> {result = dialogUpdateEmailAddresss.showAndWait();
     		result.ifPresent(_ -> theDatabase.updateEmailAddress(theUser.getUserName(), result.get()));
     		theDatabase.getUserAccountDetails(theUser.getUserName());
@@ -469,12 +466,12 @@ public class ViewUserUpdate {
         	label_CurrentEmailAddress.setText("<none>");
     		}
  			});
-=======
+
         button_UpdateEmailAddress.setOnAction((_) -> {
             result = dialogUpdateEmailAddresss.showAndWait();
             result.ifPresent(_ -> updateEmailAddressFromInput(result.get()));
         });
->>>>>>> 0c228c3 (dfjsd)
+
         
         // Set up the button to proceed to this user's home page
         setupButtonUI(button_ProceedToUserHomePage, "Dialog", 18, 300, 

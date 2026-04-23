@@ -146,7 +146,70 @@ public class PostList {
 
         post.setDeleted(true);
     }
+    /*****
+     * <p> Method: void assignGradeToPost(String postId, Double grade,
+     * String feedback, String graderUsername) </p>
+     *
+     * <p> Description: Assigns or updates a grade and private feedback for a
+     * non-deleted post. Records which staff member performed the grading. </p>
+     *
+     * @param postId the ID of the post to grade
+     * @param grade the numeric grade to assign
+     * @param feedback private feedback for the author
+     * @param graderUsername username of the staff member assigning grade
+     *
+     * @throws IllegalArgumentException if post does not exist or is deleted
+     */
+    public void assignGradeToPost(String postId,
+                                  Double grade,
+                                  String feedback,
+                                  String graderUsername) {
 
+        Post post = getPostById(postId);
+
+        if (post.isDeleted()) {
+            throw new IllegalArgumentException(
+                "Cannot grade a deleted post.");
+        }
+
+        post.assignGrade(grade, feedback, graderUsername);
+    }
+
+    /*****
+     * <p> Method: boolean isPostGraded(String postId) </p>
+     *
+     * <p> Description: Returns true if the post has already been graded. </p>
+     *
+     * @param postId the ID of the post
+     * @return true if graded, false otherwise
+     */
+    public boolean isPostGraded(String postId) {
+        Post post = getPostById(postId);
+        return post.isGraded();
+    }
+
+    /*****
+     * <p> Method: List<Post> getPostsByAuthor(String username) </p>
+     *
+     * <p> Description: Returns all posts created by the specified user. </p>
+     *
+     * @param username the username to search for
+     * @return list of posts authored by that user
+     */
+    public List<Post> getPostsByAuthor(String username) {
+
+        List<Post> results = new ArrayList<>();
+
+        if (username == null) return results;
+
+        for (Post p : allPosts) {
+            if (username.equals(p.getAuthorUsername())) {
+                results.add(p);
+            }
+        }
+
+        return results;
+    }
     /*****
      * <p> Method: void searchByKeyword(String keyword) </p>
      *

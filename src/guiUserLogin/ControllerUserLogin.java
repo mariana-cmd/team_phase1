@@ -1,8 +1,10 @@
 package guiUserLogin;
 
 import database.Database;
+
 import entityClasses.User;
 import javafx.stage.Stage;
+import java.util.*;
 
 /*******
  * <p> Title: ControllerUserLogin Class. </p>
@@ -51,6 +53,13 @@ public class ControllerUserLogin {
 
 	private static Stage theStage;	
 	
+
+	// Mapping number of incorrect attempts to users
+	private final static Map<String, Integer> failCount = new HashMap<>();
+	
+	//Mapping lock time for users
+	private final static Map<String, Long> lockTime = new HashMap<>();
+	
 	/**********
 	 * <p> Method: public doLogin() </p>
 	 * 
@@ -75,6 +84,25 @@ public class ControllerUserLogin {
 		String username = ViewUserLogin.text_Username.getText();
 		String password = ViewUserLogin.text_Password.getText();
     	boolean loginResult = false;
+
+    	//Checking if the account is locked 
+    	if (lockTime.containsKey(username)) {
+    		long elapsed = System.currentTimeMillis() - lockTime.get(username); // Time elapsed
+    		long lockDuration = 60_000; // Account is locked for 1 minute
+    		
+    		if (elapsed < lockDuration) {
+    			long secondsLeft = (lockDuration - elapsed) / 1000;
+    			ViewUserLogin.alertUsernamePasswordError.setContentText(
+    	                "Account is locked. Try again in " + secondsLeft + " second(s)");
+    	            ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    	            return;
+    		}
+    		else {
+    			// Account is unlocked, so reset the attempt count and lock time 
+    			lockTime.remove(username);
+    			lockTime.remove(username);
+    		}
+    	}
     	
 		// Fetch the user and verify the username
      	if (theDatabase.getUserAccountDetails(username) == false) {
@@ -88,14 +116,43 @@ public class ControllerUserLogin {
 		// System.out.println("*** Username is valid");
 		
 		// Check to see that the login password matches the account password
+     	// If the password is incorrect, a failed attempt will be added to the 
+     	// HashMap and when it reaches 3 the user will be blocked for a specified
+     	// amount of time from logging in. 
     	String actualPassword = theDatabase.getCurrentPassword();
 
     	if (password.compareTo(actualPassword) != 0) {
+    		
+    		//Get the number of failed login attempts. Either 0, which is default, or a number.
+    		int currAttempts = failCount.getOrDefault(username, 0);
+    		
+    		failCount.put(username, currAttempts+1);
+    		
+    		// User has 3 attempts (0, 1, 2). Locked at 3 
+    		if (currAttempts <= 1) {
     		ViewUserLogin.alertUsernamePasswordError.setContentText(
     				"Incorrect username/password. Try again!");
     		ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    		}
+    		
+    		//Warning that the user has inputed the wrong password twice 
+    		else if (currAttempts == 2) {
+    			ViewUserLogin.alertUsernamePasswordError.setContentText(
+        				"Incorrect username/password. Account will be locked at one more incorrect attempt.");
+        		ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    		}
+    		
+    		// Account is locked after the 3rd failed attempt
+    		else if (currAttempts == 3) {
+    			lockAccount(username);
+    			ViewUserLogin.alertUsernamePasswordError.setContentText(
+        				"Too many failed attempts. Account will be unlocked in 1 minute.");
+        		ViewUserLogin.alertUsernamePasswordError.showAndWait();
+    		}
     		return;
     	}
+    	
+    	
 		// System.out.println("*** Password is valid for this user");
 
 		// Establish this user's details
@@ -116,7 +173,7 @@ public class ControllerUserLogin {
 
     	// See which home page dispatch to use
 		int numberOfRoles = theDatabase.getNumberOfRoles(user);		
-		// System.out.println("*** The number of roles: "+ numberOfRoles);
+		System.out.println("*** The number of roles: "+ numberOfRoles);
 		if (numberOfRoles == 1) {
 			// Single Account Home Page - The user has no choice here
 			
@@ -148,7 +205,22 @@ public class ControllerUserLogin {
 		}
 	}
 	
-		
+	/**
+	 * <p> Method: lockAccount() </p>
+	 * 
+	 * <p> Description: This method will lock an account if the number of 
+	 *  failed login attempts exceeds 3. After some time, which depends on how
+	 *  many times an account as been locked, it will unlock. </p>
+	 *  
+	 *  @param username - the user name of the account to be locked 
+	 *  
+	 */
+	
+	protected static void lockAccount(String username) {
+		lockTime.put(username, System.currentTimeMillis());
+	}
+
+
 	/**********
 	 * <p> Method: doSetupAccount(Stage theStage, String invitationCode) </p>
 	 *

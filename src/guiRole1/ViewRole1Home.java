@@ -15,7 +15,7 @@ import entityClasses.User;
 /*******
  * <p> Title: GUIReviewerHomePage Class. </p>
  * 
- * <p> Description: The Java/FX-based Role1 Home Page.  The page is a stub for some role needed for
+ * <p> Description: The Java/FX-based Student Home Page.  The page is a stub for some role needed for
  * the application.  The widgets on this page are likely the minimum number and kind for other role
  * pages that may be needed.</p>
  * 

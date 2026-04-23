@@ -260,7 +260,7 @@ public class User {
     /*****
      * <p> Method: String getRole1() </p>
      * 
-     * <p> Description: This getter returns the value of the role1 attribute. </p>
+     * <p> Description: This getter returns the value of the student attribute. </p>
      * 
      * @return a String of "TRUE" or "FALSE" based on state of the attribute
 	 *
@@ -272,7 +272,7 @@ public class User {
     /*****
      * <p> Method: String getRole2() </p>
      * 
-     * <p> Description: This getter returns the value of the role2 attribute. </p>
+     * <p> Description: This getter returns the value of the staff attribute. </p>
      * 
      * @return a String of "TRUE" or "FALSE" based on state of the attribute
 	 *
