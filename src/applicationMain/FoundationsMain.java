@@ -86,6 +86,8 @@ public class FoundationsMain extends Application {
 	public static entityClasses.PostList postList = new entityClasses.PostList();
 	/** Shared in-memory list of all replies. */
 	public static entityClasses.ReplyList replyList = new entityClasses.ReplyList();
+	/** Shared in-memory list of all staff requests. */
+	public static entityClasses.StaffRequestList staffRequestList = new entityClasses.StaffRequestList();
     private Alert databaseInUse = new Alert(AlertType.INFORMATION);
 
 	/** Tracks which role's home page is currently active (0 = admin, 1 = role1, 2 = role2). */
@@ -93,11 +95,15 @@ public class FoundationsMain extends Application {
 												// Role 0 is the admin role number
 	@Override
 	public void start(Stage theStage) {
-		
+
 		// Connect to the in-memory database
 		try {
 			// Connect to the database
 			database.connectToDatabase();
+			// Load persisted staff requests into the in-memory list
+			for (entityClasses.StaffRequest sr : database.loadAllStaffRequests()) {
+				staffRequestList.addRequest(sr);
+			}
 		} catch (SQLException e) {
 			// If the connection request fails, it usually means some other app is using it
 			databaseInUse.setTitle("*** ERROR ***");
@@ -106,18 +112,18 @@ public class FoundationsMain extends Application {
 			databaseInUse.showAndWait();
 			System.exit(0);
 		}
-		
+
 		// If the database is empty, no users have been established, so this user must be an admin
 		// user doing initial system startup activities and we need to set that admin's username
 		// and password using a special start you page.
 		if (database.isDatabaseEmpty()) {
 			// This is a first use, so have the user set up the admin account
-			guiFirstAdmin.ViewFirstAdmin.displayFirstAdmin(theStage);	
+			guiFirstAdmin.ViewFirstAdmin.displayFirstAdmin(theStage);
 		}
 		else
 			// This is not a first use, so set up for the user to log in or create a new account
 			guiUserLogin.ViewUserLogin.displayUserLogin(theStage);
-		
+
 		// With the JavaFX pages set up, this thread of the execution comes to an end.
 	}
 

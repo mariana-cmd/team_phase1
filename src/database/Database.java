@@ -157,6 +157,19 @@ public class Database {
 	            + "role VARCHAR(10), "
 	            + "deadline TIMESTAMP)";
 	    statement.execute(invitationCodesTable);
+
+	    // Create the staff requests table
+	    String staffRequestsTable = "CREATE TABLE IF NOT EXISTS staffRequests ("
+	            + "requestId              VARCHAR(36)  PRIMARY KEY, "
+	            + "createdByUsername      VARCHAR(255) NOT NULL, "
+	            + "description            CLOB         NOT NULL, "
+	            + "status                 VARCHAR(10)  NOT NULL DEFAULT 'OPEN', "
+	            + "adminActionDescription CLOB, "
+	            + "closedByUsername       VARCHAR(255), "
+	            + "createdAt              TIMESTAMP    NOT NULL, "
+	            + "closedAt               TIMESTAMP, "
+	            + "linkedRequestId        VARCHAR(36))";
+	    statement.execute(staffRequestsTable);
 	}
 
 
@@ -1289,6 +1302,129 @@ public class Database {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+
+	/*******
+	 * <p> Method: saveStaffRequest(StaffRequest r) </p>
+	 *
+	 * <p> Description: Inserts all 9 fields of a StaffRequest into the staffRequests
+	 * table. Nullable columns use setNull() when the value is null. </p>
+	 *
+	 * @param r the StaffRequest to persist
+	 * @throws SQLException if the INSERT fails
+	 */
+	public void saveStaffRequest(entityClasses.StaffRequest r) throws SQLException {
+		String sql = "INSERT INTO staffRequests "
+				+ "(requestId, createdByUsername, description, status, "
+				+ " adminActionDescription, closedByUsername, createdAt, closedAt, linkedRequestId) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+			pstmt.setString(1, r.getRequestId());
+			pstmt.setString(2, r.getCreatedByUsername());
+			pstmt.setString(3, r.getDescription());
+			pstmt.setString(4, r.getStatus());
+			if (r.getAdminActionDescription() != null) {
+				pstmt.setString(5, r.getAdminActionDescription());
+			} else {
+				pstmt.setNull(5, java.sql.Types.CLOB);
+			}
+			if (r.getClosedByUsername() != null) {
+				pstmt.setString(6, r.getClosedByUsername());
+			} else {
+				pstmt.setNull(6, java.sql.Types.VARCHAR);
+			}
+			pstmt.setTimestamp(7, java.sql.Timestamp.valueOf(r.getCreatedAt()));
+			if (r.getClosedAt() != null) {
+				pstmt.setTimestamp(8, java.sql.Timestamp.valueOf(r.getClosedAt()));
+			} else {
+				pstmt.setNull(8, java.sql.Types.TIMESTAMP);
+			}
+			if (r.getLinkedRequestId() != null) {
+				pstmt.setString(9, r.getLinkedRequestId());
+			} else {
+				pstmt.setNull(9, java.sql.Types.VARCHAR);
+			}
+			pstmt.executeUpdate();
+		}
+	}
+
+
+	/*******
+	 * <p> Method: updateStaffRequest(StaffRequest r) </p>
+	 *
+	 * <p> Description: Updates the mutable fields of an existing request in the DB
+	 * (status, adminActionDescription, closedByUsername, closedAt). </p>
+	 *
+	 * @param r the StaffRequest whose DB row should be updated
+	 * @return true if a row was updated, false otherwise
+	 */
+	public boolean updateStaffRequest(entityClasses.StaffRequest r) {
+		String sql = "UPDATE staffRequests SET "
+				+ "status = ?, adminActionDescription = ?, closedByUsername = ?, closedAt = ? "
+				+ "WHERE requestId = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+			pstmt.setString(1, r.getStatus());
+			if (r.getAdminActionDescription() != null) {
+				pstmt.setString(2, r.getAdminActionDescription());
+			} else {
+				pstmt.setNull(2, java.sql.Types.CLOB);
+			}
+			if (r.getClosedByUsername() != null) {
+				pstmt.setString(3, r.getClosedByUsername());
+			} else {
+				pstmt.setNull(3, java.sql.Types.VARCHAR);
+			}
+			if (r.getClosedAt() != null) {
+				pstmt.setTimestamp(4, java.sql.Timestamp.valueOf(r.getClosedAt()));
+			} else {
+				pstmt.setNull(4, java.sql.Types.TIMESTAMP);
+			}
+			pstmt.setString(5, r.getRequestId());
+			return pstmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+
+	/*******
+	 * <p> Method: loadAllStaffRequests() </p>
+	 *
+	 * <p> Description: Loads all rows from the staffRequests table ordered by
+	 * createdAt ascending, reconstructing each as a StaffRequest via the
+	 * package-private constructor. </p>
+	 *
+	 * @return list of all StaffRequest objects (may be empty)
+	 */
+	public List<entityClasses.StaffRequest> loadAllStaffRequests() {
+		List<entityClasses.StaffRequest> list = new ArrayList<>();
+		String sql = "SELECT * FROM staffRequests ORDER BY createdAt ASC";
+		try (ResultSet rs = statement.executeQuery(sql)) {
+			while (rs.next()) {
+				entityClasses.StaffRequest r = new entityClasses.StaffRequest(
+						rs.getString("requestId"),
+						rs.getString("createdByUsername"),
+						rs.getString("description"),
+						rs.getString("status"),
+						rs.getString("adminActionDescription"),
+						rs.getString("closedByUsername"),
+						toLocalDateTime(rs.getTimestamp("createdAt")),
+						toLocalDateTime(rs.getTimestamp("closedAt")),
+						rs.getString("linkedRequestId")
+				);
+				list.add(r);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	/** Converts a SQL Timestamp to LocalDateTime, returning null if ts is null. */
+	private java.time.LocalDateTime toLocalDateTime(java.sql.Timestamp ts) {
+		return ts == null ? null : ts.toLocalDateTime();
 	}
 
 

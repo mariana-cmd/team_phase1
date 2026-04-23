@@ -121,6 +121,8 @@ public class ViewAdminHome {
 	protected static Button button_ListUsers = new Button("List All Users");
 	/** Button to add or remove roles for a user. */
 	protected static Button button_AddRemoveRoles = new Button("Add/Remove Roles");
+	/** Button to navigate to the Staff Requests list. */
+	protected static Button button_StaffRequests = new Button("Staff Requests");
 	/** Alert used for stub actions and informational dialogs. */
 	protected static Alert alertNotImplemented = new Alert(AlertType.INFORMATION);
 
@@ -289,7 +291,10 @@ public class ViewAdminHome {
 
 		setupButtonUI(button_AddRemoveRoles, "Dialog", 16, 250, Pos.CENTER, 20, 470);
 		button_AddRemoveRoles.setOnAction((_) -> {ControllerAdminHome.addRemoveRoles(); });
-		
+
+		setupButtonUI(button_StaffRequests, "Dialog", 16, 250, Pos.CENTER, 300, 470);
+		button_StaffRequests.setOnAction((_) -> {ControllerAdminHome.goToStaffRequests(); });
+
 		// GUI Area 5
 		setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
 		button_Logout.setOnAction((_) -> {ControllerAdminHome.performLogout(); });
@@ -304,7 +309,7 @@ public class ViewAdminHome {
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
     		label_NumberOfInvitations, label_NumberOfUsers,
     		line_Separator2,
-    		label_Invitations, 
+    		label_Invitations,
     		label_InvitationEmailAddress, text_InvitationEmailAddress,
     		combobox_SelectRole, button_SendInvitation, line_Separator3,
     		button_ManageInvitations,
@@ -312,7 +317,8 @@ public class ViewAdminHome {
     		button_DeleteUser,
     		button_ListUsers,
     		button_AddRemoveRoles,
-    		line_Separator4, 
+    		button_StaffRequests,
+    		line_Separator4,
     		button_Logout,
     		button_Quit
     		);

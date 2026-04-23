@@ -51,6 +51,18 @@ public class ControllerRole2Home {
 	}	
 
 	/**********
+	 * <p> Method: goToStaffRequests() </p>
+	 *
+	 * <p> Description: Navigates to the Staff Request List page. </p>
+	 *
+	 */
+	protected static void goToStaffRequests() {
+		guiStaffRequestList.ViewStaffRequestList.showingOpen = true;
+		guiStaffRequestList.ViewStaffRequestList.displayStaffRequestList(
+				ViewRole2Home.theStage, ViewRole2Home.theUser);
+	}
+
+	/**********
 	 * <p> Method: performLogout() </p>
 	 * 
 	 * <p> Description: This method logs out the current user and proceeds to the normal login

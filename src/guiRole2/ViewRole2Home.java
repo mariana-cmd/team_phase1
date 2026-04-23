@@ -53,11 +53,10 @@ public class ViewRole2Home {
 	// This is a separator and it is used to partition the GUI for various tasks
 	protected static Line line_Separator1 = new Line(20, 95, width-20, 95);
 
-	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
-	// would contain the widgets needed for the user to play the assigned role.
-	
-	
-	
+	// GUI Area 2: Staff Requests navigation
+	protected static Button button_StaffRequests = new Button("Staff Requests");
+
+
 	// This is a separator and it is used to partition the GUI for various tasks
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
 	
@@ -163,10 +162,9 @@ public class ViewRole2Home {
 		button_UpdateThisUser.setOnAction((_) -> {ControllerRole2Home.performUpdate(); });
 		
 		// GUI Area 2
-		
-			// This is a stub, so this area is empty
-		
-		
+		setupButtonUI(button_StaffRequests, "Dialog", 18, 200, Pos.CENTER, 20, 120);
+		button_StaffRequests.setOnAction((_) -> {ControllerRole2Home.goToStaffRequests(); });
+
 		// GUI Area 3
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 20, 540);
         button_Logout.setOnAction((_) -> {ControllerRole2Home.performLogout(); });
@@ -179,6 +177,7 @@ public class ViewRole2Home {
 		// Place all of the widget items into the Root Pane's list of children
         theRootPane.getChildren().addAll(
 			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+	        button_StaffRequests,
 	        line_Separator4, button_Logout, button_Quit);
 	}
 	
