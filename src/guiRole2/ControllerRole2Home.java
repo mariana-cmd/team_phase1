@@ -1,5 +1,8 @@
 package guiRole2;
 
+import java.util.List;
+
+import entityClasses.Post;
 import guiRole1.ViewRole1Home;
 
 /*******
@@ -63,30 +66,19 @@ public class ControllerRole2Home {
 		guiUserLogin.ViewUserLogin.displayUserLogin(ViewRole2Home.theStage);
 	}
 	
-
 	
-    /**********
-     * <p> Method: performGradePosts() </p>
-     *
-     * <p> Description: Loads all non-deleted posts into the grading list. </p>
-     */
-    protected static void performGradePosts() {
-        ViewRole2Home.listView_Posts.getItems().clear();
-
-        List<Post> posts = applicationMain.FoundationsMain.postList.getAllPosts();
-
-        for (Post p : posts) {
-            if (!p.isDeleted()) {
-                ViewRole2Home.listView_Posts.getItems().add(
-                    p.getPostId() + " | " + p.getAuthorUsername() + " | " + p.getTitle());
-            }
-        }
-
-        ViewRole2Home.label_SelectedPost.setText("Selected Post: None");
-        ViewRole2Home.label_Status.setText("Posts loaded for grading.");
-        ViewRole2Home.textField_Grade.clear();
-        ViewRole2Home.textArea_Feedback.clear();
-    }
+	/**********
+	 * <p> Method: goToAllPosts() </p>
+	 *
+	 * <p> Description: Navigates to the Staff Grades page. </p>
+	 *
+	 * Student US-1: View all discussion posts.
+	 */
+	protected static void goToGrading() {
+		guiGradePosts.ViewGradePosts.displayGradePosts(
+			ViewRole2Home.theStage, ViewRole2Home.theUser);
+	}
+    
 	/**********
 	 * <p> Method: goToAllPosts() </p>
 	 *

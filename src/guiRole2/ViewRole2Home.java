@@ -4,6 +4,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -54,8 +57,7 @@ public class ViewRole2Home {
 
 	// GUI ARea 2: This is a stub, so there are no widgets here.  For an actual role page, this are
 	// would contain the widgets needed for the user to play the assigned role.
-	
-	
+
 	
 	// This is a separator and it is used to partition the GUI for various tasks
 	protected static Line line_Separator4 = new Line(20, 525, width-20,525);
@@ -70,6 +72,7 @@ public class ViewRole2Home {
 	protected static Button button_MyPosts     = new Button("My Posts");
 	protected static Button button_SearchPosts = new Button("Search Posts");
 	protected static Button button_NewPost     = new Button("New Post");
+	protected static Button button_GradePosts  = new Button("Grade Posts");
 
 	// This is the end of the GUI objects for the page.
 	
@@ -86,7 +89,7 @@ public class ViewRole2Home {
 	
 
 	private static Scene theViewRole2HomeScene;	// The shared Scene each invocation populates
-	protected static final int theRole = 2;		// Admin: 0; Student: 1; Staff: 2 
+	protected static final int theRole = 3;		// Admin: 1; Student: 2; Staff: 3
 
 	/*-*******************************************************************************************
 
@@ -169,8 +172,8 @@ public class ViewRole2Home {
 		setupButtonUI(button_UpdateThisUser, "Dialog", 18, 170, Pos.CENTER, 610, 45);
 		button_UpdateThisUser.setOnAction((_) -> {ControllerRole2Home.performUpdate(); });
 		
-		// GUI Area 2 — Student navigation buttons
-		// Student US-1, US-3, US-5, US-6
+		// GUI Area 2 — Staff navigation buttons
+		// 
 		setupButtonUI(button_AllPosts,    "Dialog", 18, 250, Pos.CENTER,  20, 130);
 		button_AllPosts.setOnAction((_) -> { ControllerRole2Home.goToAllPosts(); });
 
@@ -182,6 +185,12 @@ public class ViewRole2Home {
 
 		setupButtonUI(button_NewPost,     "Dialog", 18, 250, Pos.CENTER, 290, 180);
 		button_NewPost.setOnAction((_) -> { ControllerRole2Home.goToCreatePost(); });
+		
+		setupButtonUI(button_GradePosts,     "Dialog", 18, 250, Pos.CENTER, 20, 230);
+		button_GradePosts.setOnAction((_) -> { ControllerRole2Home.goToGrading(); });
+		
+		
+		
 
 
 		// GUI Area 3
@@ -194,10 +203,11 @@ public class ViewRole2Home {
 		// This is the end of the GUI initialization code
 		
 		// Place all of the widget items into the Root Pane's list of children
-         theRootPane.getChildren().addAll(
-			label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
-			button_AllPosts, button_MyPosts, button_SearchPosts, button_NewPost,
-	        line_Separator4, button_Logout, button_Quit);
+        theRootPane.getChildren().addAll(
+        	    label_PageTitle, label_UserDetails, button_UpdateThisUser, line_Separator1,
+        	    button_AllPosts, button_MyPosts, button_GradePosts, button_SearchPosts, button_NewPost,
+        	    line_Separator4, button_Logout, button_Quit
+        	);
 }
 	
 	
